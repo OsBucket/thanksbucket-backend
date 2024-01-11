@@ -1,4 +1,4 @@
-package com.thanksbucket.domain;
+package com.thanksbucket.domain.member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +19,13 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
+    @Column
     private String email;
+    @Column
     private String password;
+
+    public Member(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 }
