@@ -2,9 +2,9 @@ package com.thanksbucket.ui.api;
 
 import com.thanksbucket.application.AuthService;
 import com.thanksbucket.ui.dto.SignupRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +17,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request) {
         authService.signup(request);
         return ResponseEntity.ok().build();
     }
