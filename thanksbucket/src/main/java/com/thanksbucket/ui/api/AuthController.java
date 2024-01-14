@@ -2,6 +2,7 @@ package com.thanksbucket.ui.api;
 
 import com.thanksbucket.application.AuthService;
 import com.thanksbucket.ui.dto.SignupRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "auth", description = "인증")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;

@@ -33,7 +33,7 @@ public class SecurityConfig {
                 //TODO 권한 조정 필요
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/").permitAll()
-                        .requestMatchers("/api/auth/login", "api/auth/signup").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/signup","/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
