@@ -30,14 +30,14 @@ public class AuthController {
 
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(HttpSession session) {
-        if(session != null) {
+        if (session != null) {
             session.invalidate();
         }
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/current")
-    public ResponseEntity<String> current(@AuthenticationPrincipal User user) {
+    @GetMapping("/profile")
+    public ResponseEntity<String> profile(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(user.getUsername());
     }
 }
