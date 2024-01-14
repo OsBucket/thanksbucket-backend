@@ -33,6 +33,6 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
         System.out.println("header = " + header);
         response.setHeader("Set-Cookie", header);
 
-        objectMapper.writeValue(response.getWriter(), memberContext.getMember());
+//        objectMapper.writeValue(response.getWriter(), memberContext.getMember());
     }
 }
