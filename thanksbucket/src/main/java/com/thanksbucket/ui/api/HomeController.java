@@ -12,18 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final SessionRegistry sessionRegistry;
-
     @GetMapping("/")
-    public String getAllSessionRegistry(HttpSession session) {
-        sessionRegistry.getAllPrincipals().forEach(System.out::println);
+    public String index() {
         return "home";
-    }
-
-    @GetMapping("/api/users")
-    public String users(HttpSession session) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication);
-        return authentication.getName();
     }
 }

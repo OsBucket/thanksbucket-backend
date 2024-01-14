@@ -10,6 +10,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Table(name = "members")
@@ -20,12 +22,29 @@ public class Member {
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
     @Column
+    private String userId;
+    @Column
     private String email;
     @Column
     private String password;
+    @Column
+    private String nickname;
+    @Column
+    private LocalDate birthday;
+    @Column
+    private String job;
+
 
     public Member(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    public Member(String userId, String password, String nickname, LocalDate birthday, String job) {
+        this.userId = userId;
+        this.password = password;
+        this.nickname = nickname;
+        this.birthday = birthday;
+        this.job = job;
     }
 }
