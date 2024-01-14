@@ -23,13 +23,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //TODO 저장구현 후 삭제
-        memberRepository.save(new Member("user", passwordEncoder.encode("1111")));
         Member member = memberRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 이메일 입니다."));
+                .orElse(new Member("user", passwordEncoder.encode("1111")));
+
+//        Member member = memberRepository.findByEmail(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 이메일 입니다."));
 
         //TODO roles 하드코딩
         List<GrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority("USER"));
+        roles.add(new SimpleGrantedAuthority("ROLE_USER"));
 
         return new MemberContext(member, roles);
     }

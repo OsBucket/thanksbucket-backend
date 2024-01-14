@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -24,23 +25,30 @@ public class SecurityConfig {
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AccessDeniedHandler accessDeniedHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 //TODO 권한 조정 필요
                 .authorizeHttpRequests((authorize) -> authorize
-//                                .requestMatchers("/api/auth/**").permitAll()
-//                                .requestMatchers("/**").hasRole("USER")
-                                .requestMatchers("/**").permitAll()
-                                .anyRequest()
-                                .authenticated()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/**").hasRole("USER")
+                        .anyRequest()
+                        .authenticated()
                 )
+                .exceptionHandling((exceptionHandling) -> {
+                    exceptionHandling.accessDeniedHandler(accessDeniedHandler);
+                    exceptionHandling.authenticationEntryPoint(authenticationEntryPoint);
+                })
+                .sessionManagement((sessionManagement) -> {
+                    sessionManagement.maximumSessions(1)
+                            .maxSessionsPreventsLogin(true);
+                })
                 .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement((sessionManagement) -> sessionManagement
-                        .sessionFixation().changeSessionId()
-                )
                 .csrf(csrf -> csrf.disable());
+
         return http.build();
     }
 

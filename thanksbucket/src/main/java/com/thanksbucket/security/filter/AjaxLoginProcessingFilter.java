@@ -12,16 +12,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
 public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingFilter {
+    private static final String LOGIN_PATH = "/api/auth/login";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public AjaxLoginProcessingFilter() {
-        super(new AntPathRequestMatcher("/api/auth/login"));
+        super(new AntPathRequestMatcher(LOGIN_PATH));
     }
 
     @Override
