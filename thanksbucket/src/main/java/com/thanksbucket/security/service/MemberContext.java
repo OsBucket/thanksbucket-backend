@@ -13,4 +13,8 @@ public class MemberContext extends User {
         super(member.getEmail(), member.getPassword(), authorities);
         this.member = member;
     }
+
+    public Member getMember() {
+        return member;
+    }
 }
