@@ -2,7 +2,6 @@ package com.thanksbucket.ui.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.thanksbucket.domain.member.Member;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -29,8 +28,4 @@ public class SignupRequest {
     private LocalDate birthday;
 
     private String job;
-
-    public Member toEntity() {
-        return new Member(memberId, password, nickname, birthday, job);
-    }
 }

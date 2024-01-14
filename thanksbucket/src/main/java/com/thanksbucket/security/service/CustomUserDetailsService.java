@@ -22,12 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //TODO 저장구현 후 삭제
         Member member = memberRepository.findByMemberId(username)
-                .orElse(new Member("user", passwordEncoder.encode("1111")));
-
-//        Member member = memberRepository.findByEmail(username)
-//                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 이메일 입니다."));
+                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 memberId 입니다."));
 
         //TODO roles 하드코딩
         List<GrantedAuthority> roles = new ArrayList<>();

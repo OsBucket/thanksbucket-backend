@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
@@ -21,7 +22,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
-    @Column
+    @Column(unique = true)
     private String memberId;
     @Column
     private String password;
@@ -32,17 +33,16 @@ public class Member {
     @Column
     private String job;
 
-
-    public Member(String memberId, String password) {
-        this.memberId = memberId;
-        this.password = password;
-    }
-
     public Member(String memberId, String password, String nickname, LocalDate birthday, String job) {
         this.memberId = memberId;
         this.password = password;
         this.nickname = nickname;
         this.birthday = birthday;
         this.job = job;
+    }
+
+    public static Member signup(PasswordEncoder passwordEncoder, String memberId, String password, String nickname, LocalDate birthday, String job) {
+        password = passwordEncoder.encode(password);
+        return new Member(memberId, password, nickname, birthday, job);
     }
 }
