@@ -33,11 +33,11 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
         }
         ServletInputStream inputStream = request.getInputStream();
         LoginDto loginDto = objectMapper.readValue(inputStream, LoginDto.class);
-        if (loginDto.getEmail().isBlank() || loginDto.getPassword().isBlank()) {
-            throw new IllegalArgumentException("email or password is empty");
+        if (loginDto.getMemberId().isBlank() || loginDto.getPassword().isBlank()) {
+            throw new IllegalArgumentException("memberId or password is empty");
         }
 
-        AjaxAuthenticationToken ajaxAuthenticationToken = new AjaxAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
+        AjaxAuthenticationToken ajaxAuthenticationToken = new AjaxAuthenticationToken(loginDto.getMemberId(), loginDto.getPassword());
         return getAuthenticationManager().authenticate(ajaxAuthenticationToken);
     }
 }

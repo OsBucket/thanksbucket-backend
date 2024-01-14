@@ -22,9 +22,7 @@ public class Member {
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
     @Column
-    private String userId;
-    @Column
-    private String email;
+    private String memberId;
     @Column
     private String password;
     @Column
@@ -35,13 +33,13 @@ public class Member {
     private String job;
 
 
-    public Member(String email, String password) {
-        this.email = email;
+    public Member(String memberId, String password) {
+        this.memberId = memberId;
         this.password = password;
     }
 
-    public Member(String userId, String password, String nickname, LocalDate birthday, String job) {
-        this.userId = userId;
+    public Member(String memberId, String password, String nickname, LocalDate birthday, String job) {
+        this.memberId = memberId;
         this.password = password;
         this.nickname = nickname;
         this.birthday = birthday;
