@@ -40,4 +40,12 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
         AjaxAuthenticationToken ajaxAuthenticationToken = new AjaxAuthenticationToken(loginDto.getMemberId(), loginDto.getPassword());
         return getAuthenticationManager().authenticate(ajaxAuthenticationToken);
     }
+
+    public final String getUsernameParameter() {
+        return "memberId";
+    }
+
+    public final String getPasswordParameter() {
+        return "password";
+    }
 }
