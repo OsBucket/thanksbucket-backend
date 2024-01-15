@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @AllArgsConstructor
 @Getter
-public class BucketRequest {
+public class CreateBucketRequest {
     @NotBlank
     private String title;
 
