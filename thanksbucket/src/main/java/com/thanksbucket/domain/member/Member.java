@@ -15,21 +15,26 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "members")
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
+
     @Column(unique = true)
     private String memberId;
+
     @Column
     private String password;
+
     @Column
     private String nickname;
+
     @Column
     private LocalDate birthday;
+
     @Column
     private String job;
 
