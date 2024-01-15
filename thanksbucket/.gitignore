@@ -38,3 +38,6 @@ out/
 
 local/
 src/main/resources/*.properties
+src/main/resources/resources-env/staging
+src/main/resources/resources-env/production
+
