@@ -40,13 +40,14 @@ public class Bucket {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public Bucket(String title, LocalDate startDate) {
+    public Bucket(String title, LocalDate startDate, Member member) {
         this.title = title;
         this.startDate = startDate;
+        this.member = member;
     }
 
-    public static Bucket create(String title, LocalDate startDate) {
-        Bucket bucket = new Bucket(title, startDate);
+    public static Bucket create(Member member, String title, LocalDate startDate) {
+        Bucket bucket = new Bucket(title, startDate, member);
         bucket.createdAt = LocalDateTime.now();
         return bucket;
     }
