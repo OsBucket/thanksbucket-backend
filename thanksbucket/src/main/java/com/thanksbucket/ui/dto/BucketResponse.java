@@ -7,8 +7,8 @@ import java.time.LocalDate;
 
 @Getter
 public class BucketResponse {
-    private String title;
-    private LocalDate startDate;
+    private final String title;
+    private final LocalDate startDate;
 
     public BucketResponse(Bucket bucket) {
         this.title = bucket.getTitle();
