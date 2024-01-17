@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -31,11 +32,6 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         HttpSession session = request.getSession();
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
-
-        //TODO Secure 추가
-        String header = "JSESSIONID=" + session.getId() + "; SameSite=Strict; path=/;";
-        response.setHeader("Set-Cookie", header);
-
 
         log.info("로그인 성공: user:{}, JSESSIONID:{}", memberContext.getMember().getMemberId(), session.getId());
         objectMapper.writeValue(response.getWriter(), new HashMap<>() {{
