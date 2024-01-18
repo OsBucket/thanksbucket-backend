@@ -4,6 +4,8 @@ import com.thanksbucket.domain.bucket.Bucket;
 import com.thanksbucket.domain.bucket.BucketRepository;
 import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.member.MemberRepository;
+import com.thanksbucket.domain.topic.Topic;
+import com.thanksbucket.domain.topic.TopicRepository;
 import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +21,13 @@ import java.util.stream.Collectors;
 public class BucketService {
     private final MemberRepository memberRepository;
     private final BucketRepository bucketRepository;
+    private final TopicRepository topicRepository;
 
     @Transactional
     public Long create(String memberId, CreateBucketRequest request) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-        Bucket bucket = Bucket.create(member, request.getTitle(), request.getStartDate());
+        List<Topic> topics = topicRepository.findAllById(request.getTopicIds());
+        Bucket bucket = Bucket.create(member, request.getTitle(), request.getStartDate(), topics);
         return bucketRepository.save(bucket).getId();
     }
 
