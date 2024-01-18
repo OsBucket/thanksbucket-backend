@@ -8,7 +8,6 @@ import com.thanksbucket.domain.topic.Topic;
 import com.thanksbucket.domain.topic.TopicRepository;
 import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
-import com.thanksbucket.ui.dto.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
