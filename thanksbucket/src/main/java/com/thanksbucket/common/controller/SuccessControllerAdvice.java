@@ -1,5 +1,6 @@
-package com.thanksbucket.common.advice;
+package com.thanksbucket.common.controller;
 
+import com.thanksbucket.common.response.ErrorResponse;
 import com.thanksbucket.common.response.SuccessResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @RestControllerAdvice(basePackages = "com.thanksbucket")
-public class SuccessResponseAdvice implements ResponseBodyAdvice<Object> {
+public class SuccessControllerAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         return MappingJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
@@ -43,6 +44,11 @@ public class SuccessResponseAdvice implements ResponseBodyAdvice<Object> {
                     .build();
         }
 
+        if (resolve.is4xxClientError()) {
+            if (body instanceof ErrorResponse) {
+                ((ErrorResponse) body).setPath(request.getURI().getPath());
+            }
+        }
         return body;
     }
 }
