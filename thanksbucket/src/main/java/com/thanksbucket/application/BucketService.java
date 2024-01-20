@@ -40,4 +40,11 @@ public class BucketService {
         List<Bucket> buckets = bucketRepository.findBucketsByMember(member);
         return buckets.stream().map(BucketResponse::new).collect(Collectors.toList());
     }
+
+    public BucketResponse findById(String memberId, Long bucketId) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
+        bucket.validateOwner(member);
+        return new BucketResponse(bucket);
+    }
 }

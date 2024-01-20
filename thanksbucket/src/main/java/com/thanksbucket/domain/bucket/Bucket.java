@@ -74,4 +74,10 @@ public class Bucket {
     public void addTodo(String content, Boolean isDone) {
         this.bucketTodos.add(BucketTodo.create(content, isDone, this));
     }
+
+    public void validateOwner(Member member) {
+        if (!this.member.equals(member)) {
+            throw new IllegalArgumentException("해당 버킷에 대한 권한이 없습니다.");
+        }
+    }
 }
