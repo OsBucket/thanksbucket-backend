@@ -20,4 +20,7 @@ public class CreateBucketRequest {
 
     @NotNull
     private List<Long> topicIds;
+
+    @NotNull
+    private List<CreateBucketTodoRequest> bucketTodos;
 }

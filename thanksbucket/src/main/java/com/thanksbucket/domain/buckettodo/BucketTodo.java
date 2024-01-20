@@ -1,7 +1,6 @@
-package com.thanksbucket.domain.buckettopic;
+package com.thanksbucket.domain.buckettodo;
 
 import com.thanksbucket.domain.bucket.Bucket;
-import com.thanksbucket.domain.topic.Topic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "bucket_topics")
-public class BucketTopic {
+public class BucketTodo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
@@ -30,22 +27,24 @@ public class BucketTopic {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false, unique = true)
+    private String content;
+
+    @Column(nullable = false)
+    private Boolean isDone;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bucket_id")
     private Bucket bucket;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id")
-    private Topic topic;
-
-    public BucketTopic(Bucket bucket, Topic topic) {
-        this.bucket = bucket;
-        this.topic = topic;
+    public BucketTodo(String content, Boolean isDone) {
+        this.content = content;
+        this.isDone = isDone;
     }
 
-    public static BucketTopic create(Bucket bucket, Topic topic) {
-        BucketTopic bucketTopic = new BucketTopic(bucket, topic);
-        bucketTopic.createdAt = LocalDateTime.now();
-        return bucketTopic;
+    public static BucketTodo create(String content, Boolean isDone) {
+        BucketTodo bucketTodo = new BucketTodo(content, isDone);
+        bucketTodo.createdAt = LocalDateTime.now();
+        return bucketTodo;
     }
 }
