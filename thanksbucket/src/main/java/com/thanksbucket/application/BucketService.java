@@ -52,13 +52,12 @@ public class BucketService {
     }
 
     @Transactional
-    public Long update(String username, Long bucketId, CreateBucketRequest request) {
-        Member member = memberRepository.findByMemberId(username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+    public Long update(String memberId, Long bucketId, CreateBucketRequest request) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
         Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
         List<Topic> topics = topicRepository.findAllById(request.getTopicIds());
 
-        bucket.validateOwner(member);
-        bucket.update(request.getTitle(), request.getStartDate());
+        bucket.update(member, request.getTitle(), request.getStartDate());
         bucket.updateTopics(topics);
         bucket.updateTodos(request.getBucketTodos()
                 .stream()
@@ -68,4 +67,11 @@ public class BucketService {
     }
 
 
+    @Transactional
+    public void delete(String memberId, Long bucketId) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
+        bucket.validateOwner(member);
+        bucketRepository.delete(bucket);
+    }
 }

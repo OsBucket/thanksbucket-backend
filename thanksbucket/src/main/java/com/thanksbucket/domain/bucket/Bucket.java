@@ -81,7 +81,8 @@ public class Bucket {
         }
     }
 
-    public void update(String title, LocalDate startDate) {
+    public void update(Member member, String title, LocalDate startDate) {
+        this.validateOwner(member);
         this.bucketTopics.clear();
         this.bucketTodos.clear();
         this.title = title;
