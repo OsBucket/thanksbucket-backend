@@ -27,7 +27,11 @@ public class BucketService {
     public Long create(String memberId, CreateBucketRequest request) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
         List<Topic> topics = topicRepository.findAllById(request.getTopicIds());
-        Bucket bucket = Bucket.create(member, request.getTitle(), request.getStartDate(), topics);
+
+        Bucket bucket = Bucket.create(request.getTitle(), request.getStartDate(), member);
+        bucket.resetTopics(topics);
+        request.getBucketTodos()
+                .forEach(todo -> bucket.addTodo(todo.getContent(), todo.getIsDone()));
         return bucketRepository.save(bucket).getId();
     }
 

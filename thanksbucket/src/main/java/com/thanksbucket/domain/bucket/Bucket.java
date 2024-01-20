@@ -1,5 +1,6 @@
 package com.thanksbucket.domain.bucket;
 
+import com.thanksbucket.domain.buckettodo.BucketTodo;
 import com.thanksbucket.domain.buckettopic.BucketTopic;
 import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.topic.Topic;
@@ -50,18 +51,27 @@ public class Bucket {
     @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL)
     private List<BucketTopic> bucketTopics = new ArrayList<>();
 
+    @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL)
+    private List<BucketTodo> bucketTodos = new ArrayList<>();
 
-    public Bucket(String title, LocalDate startDate, Member member, List<BucketTopic> bucketTopics) {
+
+    public Bucket(String title, LocalDate startDate, Member member) {
         this.title = title;
         this.startDate = startDate;
         this.member = member;
-        this.bucketTopics = bucketTopics;
     }
 
-    public static Bucket create(Member member, String title, LocalDate startDate, List<Topic> topics) {
-        Bucket bucket = new Bucket(title, startDate, member, null);
+    public static Bucket create(String title, LocalDate startDate, Member member) {
+        Bucket bucket = new Bucket(title, startDate, member);
         bucket.createdAt = LocalDateTime.now();
-        bucket.bucketTopics = topics.stream().map(topic -> new BucketTopic(LocalDateTime.now(), bucket, topic)).collect(Collectors.toList());
         return bucket;
+    }
+
+    public void resetTopics(List<Topic> topics) {
+        this.bucketTopics = topics.stream().map(topic -> BucketTopic.create(this, topic)).collect(Collectors.toList());
+    }
+
+    public void addTodo(String content, Boolean isDone) {
+        this.bucketTodos.add(BucketTodo.create(content, isDone, this));
     }
 }

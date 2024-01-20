@@ -23,7 +23,7 @@ public class BucketTopicController {
     private final BucketTopicService bucketTopicService;
 
     @GetMapping("")
-    public ResponseEntity<List<BucketTopicResponse>> findAll(@AuthenticationPrincipal User user, @NotNull @RequestParam Long bucketId) {
+    public ResponseEntity<List<BucketTopicResponse>> findAllByBucketId(@AuthenticationPrincipal User user, @NotNull @RequestParam Long bucketId) {
         return ResponseEntity.ok(bucketTopicService.findAllByBucketId(bucketId));
     }
 }
