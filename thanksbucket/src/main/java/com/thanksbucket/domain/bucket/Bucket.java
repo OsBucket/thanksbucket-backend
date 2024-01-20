@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -48,10 +47,10 @@ public class Bucket {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BucketTopic> bucketTopics = new ArrayList<>();
 
-    @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BucketTodo> bucketTodos = new ArrayList<>();
 
 
@@ -67,11 +66,36 @@ public class Bucket {
         return bucket;
     }
 
-    public void resetTopics(List<Topic> topics) {
-        this.bucketTopics = topics.stream().map(topic -> BucketTopic.create(this, topic)).collect(Collectors.toList());
+    public void addTopics(List<Topic> topics) {
+        this.bucketTopics.addAll(topics.stream().map(topic -> BucketTopic.create(this, topic)).toList());
     }
 
-    public void addTodo(String content, Boolean isDone) {
-        this.bucketTodos.add(BucketTodo.create(content, isDone, this));
+    public void addTodos(List<BucketTodo> todos) {
+        todos.forEach(todo -> todo.setBucket(this));
+        this.bucketTodos.addAll(todos);
+    }
+
+    public void validateOwner(Member member) {
+        if (!this.member.equals(member)) {
+            throw new IllegalArgumentException("해당 버킷에 대한 권한이 없습니다.");
+        }
+    }
+
+    public void update(Member member, String title, LocalDate startDate) {
+        this.validateOwner(member);
+        this.bucketTopics.clear();
+        this.bucketTodos.clear();
+        this.title = title;
+        this.startDate = startDate;
+    }
+
+    public void updateTopics(List<Topic> topics) {
+        this.bucketTopics.clear();
+        this.addTopics(topics);
+    }
+
+    public void updateTodos(List<BucketTodo> bucketTodos) {
+        this.bucketTodos.clear();
+        this.addTodos(bucketTodos);
     }
 }
