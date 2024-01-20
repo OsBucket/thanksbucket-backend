@@ -25,7 +25,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         MemberContext memberContext = (MemberContext) userDetailsService.loadUserByUsername(username);
         if (!passwordEncoder.matches(password, memberContext.getPassword())) {
-            throw new BadCredentialsException("Invalid password");
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberContext, null, memberContext.getAuthorities());
