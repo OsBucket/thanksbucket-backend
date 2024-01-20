@@ -43,9 +43,13 @@ public class BucketTodo {
         this.bucket = bucket;
     }
 
-    public static BucketTodo create(String content, Boolean isDone, Bucket bucket) {
-        BucketTodo bucketTodo = new BucketTodo(content, isDone, bucket);
+    public static BucketTodo create(String content, Boolean isDone) {
+        BucketTodo bucketTodo = new BucketTodo(content, isDone, null);
         bucketTodo.createdAt = LocalDateTime.now();
         return bucketTodo;
+    }
+
+    public void setBucket(Bucket bucket) {
+        this.bucket = bucket;
     }
 }
