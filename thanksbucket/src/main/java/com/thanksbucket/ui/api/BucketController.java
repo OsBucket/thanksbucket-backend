@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -29,9 +30,7 @@ public class BucketController {
 
     @PostMapping("")
     public ResponseEntity<Void> create(@AuthenticationPrincipal User user, @Valid @RequestBody CreateBucketRequest request) {
-        bucketService.create(user.getUsername(), request);
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(URI.create(null)).build();
     }
 
     @GetMapping("")
@@ -47,12 +46,12 @@ public class BucketController {
     @PutMapping("/{bucketId}")
     public ResponseEntity<Void> update(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody CreateBucketRequest request) {
         bucketService.update(user.getUsername(), bucketId, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(null).build();
     }
 
     @DeleteMapping("/{bucketId}")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal User user, @PathVariable Long bucketId) {
         bucketService.delete(user.getUsername(), bucketId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
