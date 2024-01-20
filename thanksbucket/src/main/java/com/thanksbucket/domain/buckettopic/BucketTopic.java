@@ -31,11 +31,11 @@ public class BucketTopic {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bucket_id")
+    @JoinColumn(name = "bucket_id", nullable = false)
     private Bucket bucket;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id")
+    @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
 
     public BucketTopic(Bucket bucket, Topic topic) {

@@ -27,23 +27,24 @@ public class BucketTodo {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
     private Boolean isDone;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bucket_id")
+    @JoinColumn(name = "bucket_id", nullable = false)
     private Bucket bucket;
 
-    public BucketTodo(String content, Boolean isDone) {
+    public BucketTodo(String content, Boolean isDone, Bucket bucket) {
         this.content = content;
         this.isDone = isDone;
+        this.bucket = bucket;
     }
 
-    public static BucketTodo create(String content, Boolean isDone) {
-        BucketTodo bucketTodo = new BucketTodo(content, isDone);
+    public static BucketTodo create(String content, Boolean isDone, Bucket bucket) {
+        BucketTodo bucketTodo = new BucketTodo(content, isDone, bucket);
         bucketTodo.createdAt = LocalDateTime.now();
         return bucketTodo;
     }

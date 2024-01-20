@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class BucketResponse {
@@ -15,11 +16,15 @@ public class BucketResponse {
     private final String title;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDate startDate;
+    private final List<BucketTodoResponse> bucketTodos;
 
     public BucketResponse(Bucket bucket) {
         this.id = bucket.getId();
         this.createdAt = bucket.getCreatedAt();
         this.title = bucket.getTitle();
         this.startDate = bucket.getStartDate();
+        this.bucketTodos = bucket.getBucketTodos().stream()
+                .map(BucketTodoResponse::new)
+                .toList();
     }
 }

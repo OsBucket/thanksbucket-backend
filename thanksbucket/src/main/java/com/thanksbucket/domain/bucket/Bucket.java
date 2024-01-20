@@ -67,11 +67,11 @@ public class Bucket {
         return bucket;
     }
 
-    public void setTopics(List<Topic> topics) {
+    public void resetTopics(List<Topic> topics) {
         this.bucketTopics = topics.stream().map(topic -> BucketTopic.create(this, topic)).collect(Collectors.toList());
     }
 
-    public void setTodos(List<BucketTodo> bucketTodos) {
-        this.bucketTodos = bucketTodos;
+    public void addTodo(String content, Boolean isDone) {
+        this.bucketTodos.add(BucketTodo.create(content, isDone, this));
     }
 }
