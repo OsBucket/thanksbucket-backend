@@ -18,6 +18,6 @@ public class BucketTodoResponse {
         this.id = bucketTodo.getId();
         this.createdAt = bucketTodo.getCreatedAt();
         this.content = bucketTodo.getContent();
-        this.isDone = bucketTodo.getIsDone();
+        this.isDone = bucketTodo.isDone();
     }
 }

@@ -9,6 +9,7 @@ import com.thanksbucket.domain.topic.TopicRepository;
 import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
 import com.thanksbucket.ui.dto.CreateBucketTodoRequest;
+import com.thanksbucket.ui.dto.UpdateBucketRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +53,7 @@ public class BucketService {
     }
 
     @Transactional
-    public Long update(String memberId, Long bucketId, CreateBucketRequest request) {
+    public Long update(String memberId, Long bucketId, UpdateBucketRequest request) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
         Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
         List<Topic> topics = topicRepository.findAllById(request.getTopicIds());
@@ -63,6 +64,8 @@ public class BucketService {
                 .stream()
                 .map(CreateBucketTodoRequest::toEntity)
                 .toList());
+        // TODO 리팩토링 필요
+        bucket.updateIsDone(request.getIsDone());
         return bucketId;
     }
 

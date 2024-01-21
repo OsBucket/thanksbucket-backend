@@ -16,6 +16,8 @@ public class BucketResponse {
     private final String title;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDate startDate;
+
+    private final Boolean isDone;
     private final List<BucketTodoResponse> bucketTodos;
     private final List<TopicResponse> bucketTopics;
 
@@ -24,6 +26,7 @@ public class BucketResponse {
         this.createdAt = bucket.getCreatedAt();
         this.title = bucket.getTitle();
         this.startDate = bucket.getStartDate();
+        this.isDone = bucket.isDone();
         this.bucketTodos = bucket.getBucketTodos().stream()
                 .map(BucketTodoResponse::new)
                 .toList();
