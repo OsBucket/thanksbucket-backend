@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface BucketRepository extends JpaRepository<Bucket, Long> {
-    List<Bucket> findBucketsByMember(Member member);
+    List<Bucket> findBucketsByMemberOrderByCreatedAtDesc(Member member);
 }

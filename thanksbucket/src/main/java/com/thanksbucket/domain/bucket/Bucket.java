@@ -43,6 +43,9 @@ public class Bucket {
     @Column
     private LocalDate startDate;
 
+    @Column(nullable = false)
+    private boolean isDone;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -54,14 +57,15 @@ public class Bucket {
     private List<BucketTodo> bucketTodos = new ArrayList<>();
 
 
-    public Bucket(String title, LocalDate startDate, Member member) {
+    public Bucket(String title, LocalDate startDate, boolean isDone, Member member) {
         this.title = title;
         this.startDate = startDate;
+        this.isDone = isDone;
         this.member = member;
     }
 
     public static Bucket create(String title, LocalDate startDate, Member member) {
-        Bucket bucket = new Bucket(title, startDate, member);
+        Bucket bucket = new Bucket(title, startDate, false, member);
         bucket.createdAt = LocalDateTime.now();
         return bucket;
     }
@@ -97,5 +101,14 @@ public class Bucket {
     public void updateTodos(List<BucketTodo> bucketTodos) {
         this.bucketTodos.clear();
         this.addTodos(bucketTodos);
+    }
+
+    public void updateIsDone(boolean isDone) {
+        bucketTodos.forEach(todo -> {
+            if (!todo.isDone() && isDone) {
+                throw new IllegalArgumentException("아직 완료되지 않은 TODO가 있습니다.");
+            }
+        });
+        this.isDone = isDone;
     }
 }

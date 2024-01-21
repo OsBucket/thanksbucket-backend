@@ -31,19 +31,19 @@ public class BucketTodo {
     private String content;
 
     @Column(nullable = false)
-    private Boolean isDone;
+    private boolean isDone;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bucket_id", nullable = false)
     private Bucket bucket;
 
-    public BucketTodo(String content, Boolean isDone, Bucket bucket) {
+    public BucketTodo(String content, boolean isDone, Bucket bucket) {
         this.content = content;
         this.isDone = isDone;
         this.bucket = bucket;
     }
 
-    public static BucketTodo create(String content, Boolean isDone) {
+    public static BucketTodo create(String content, boolean isDone) {
         BucketTodo bucketTodo = new BucketTodo(content, isDone, null);
         bucketTodo.createdAt = LocalDateTime.now();
         return bucketTodo;

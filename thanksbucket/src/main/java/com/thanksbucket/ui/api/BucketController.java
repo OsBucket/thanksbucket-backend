@@ -3,6 +3,7 @@ package com.thanksbucket.ui.api;
 import com.thanksbucket.application.BucketService;
 import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
+import com.thanksbucket.ui.dto.UpdateBucketRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class BucketController {
 
     @PostMapping("")
     public ResponseEntity<Void> create(@AuthenticationPrincipal User user, @Valid @RequestBody CreateBucketRequest request) {
+        bucketService.create(user.getUsername(), request);
         return ResponseEntity.created(URI.create(null)).build();
     }
 
@@ -44,7 +46,7 @@ public class BucketController {
     }
 
     @PutMapping("/{bucketId}")
-    public ResponseEntity<Void> update(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody CreateBucketRequest request) {
+    public ResponseEntity<Void> update(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody UpdateBucketRequest request) {
         bucketService.update(user.getUsername(), bucketId, request);
         return ResponseEntity.created(null).build();
     }
