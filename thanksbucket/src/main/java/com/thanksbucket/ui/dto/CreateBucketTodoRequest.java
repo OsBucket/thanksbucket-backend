@@ -12,9 +12,9 @@ public class CreateBucketTodoRequest {
     @NotBlank
     private String content;
     @NotNull
-    private Boolean isDone;
+    private boolean isDone;
 
     public BucketTodo toEntity() {
-        return BucketTodo.create(this.getContent(), this.getIsDone());
+        return BucketTodo.create(this.getContent(), this.isDone());
     }
 }
