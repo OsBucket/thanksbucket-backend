@@ -16,7 +16,7 @@ public class UpdateBucketRequest {
     private String title;
 
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
-    private LocalDate startDate;
+    private LocalDate goalDate;
 
     @NotNull
     private Boolean isDone;

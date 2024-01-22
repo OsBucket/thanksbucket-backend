@@ -31,7 +31,7 @@ public class BucketService {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
         List<Topic> topics = topicRepository.findAllById(request.getTopicIds());
 
-        Bucket bucket = Bucket.create(request.getTitle(), request.getStartDate(), member);
+        Bucket bucket = Bucket.create(request.getTitle(), request.getGoalDate(), member);
         bucket.addTopics(topics);
         bucket.addTodos(request.getBucketTodos()
                 .stream()
@@ -59,7 +59,7 @@ public class BucketService {
         Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
         List<Topic> topics = topicRepository.findAllById(request.getTopicIds());
 
-        bucket.update(member, request.getTitle(), request.getStartDate());
+        bucket.update(member, request.getTitle(), request.getGoalDate());
         bucket.updateTopics(topics);
         bucket.updateTodos(request.getBucketTodos()
                 .stream()
