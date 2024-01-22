@@ -104,11 +104,11 @@ public class Bucket {
     }
 
     public void updateIsDone(boolean isDone) {
-        bucketTodos.forEach(todo -> {
-            if (!todo.isDone() && isDone) {
-                throw new IllegalArgumentException("아직 완료되지 않은 TODO가 있습니다.");
-            }
-        });
-        this.isDone = isDone;
+        if (!isDone) {
+            this.isDone = false;
+            return;
+        }
+        bucketTodos.forEach(BucketTodo::done);
+        this.isDone = true;
     }
 }

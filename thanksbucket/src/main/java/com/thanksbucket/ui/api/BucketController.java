@@ -3,6 +3,7 @@ package com.thanksbucket.ui.api;
 import com.thanksbucket.application.BucketService;
 import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
+import com.thanksbucket.ui.dto.PatchBucketRequest;
 import com.thanksbucket.ui.dto.UpdateBucketRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,8 +33,8 @@ public class BucketController {
 
     @PostMapping("")
     public ResponseEntity<Void> create(@AuthenticationPrincipal User user, @Valid @RequestBody CreateBucketRequest request) {
-        bucketService.create(user.getUsername(), request);
-        return ResponseEntity.created(URI.create(null)).build();
+        Long bucketId = bucketService.create(user.getUsername(), request);
+        return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
     @GetMapping("")
@@ -46,9 +48,15 @@ public class BucketController {
     }
 
     @PutMapping("/{bucketId}")
-    public ResponseEntity<Void> update(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody UpdateBucketRequest request) {
+    public ResponseEntity<Void> put(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody UpdateBucketRequest request) {
         bucketService.update(user.getUsername(), bucketId, request);
-        return ResponseEntity.created(null).build();
+        return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
+    }
+
+    @PatchMapping("/{bucketId}")
+    public ResponseEntity<Void> patch(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody PatchBucketRequest request) {
+        bucketService.patch(user.getUsername(), bucketId, request);
+        return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
     @DeleteMapping("/{bucketId}")
