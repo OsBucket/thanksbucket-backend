@@ -16,7 +16,7 @@ public class CreateBucketRequest {
     private String title;
 
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
-    private LocalDate startDate;
+    private LocalDate goalDate;
 
     @NotNull
     private List<Long> topicIds;

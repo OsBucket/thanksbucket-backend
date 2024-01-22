@@ -41,7 +41,7 @@ public class Bucket {
     private String title;
 
     @Column
-    private LocalDate startDate;
+    private LocalDate goalDate;
 
     @Column(nullable = false)
     private boolean isDone;
@@ -57,15 +57,15 @@ public class Bucket {
     private List<BucketTodo> bucketTodos = new ArrayList<>();
 
 
-    public Bucket(String title, LocalDate startDate, boolean isDone, Member member) {
+    public Bucket(String title, LocalDate goalDate, boolean isDone, Member member) {
         this.title = title;
-        this.startDate = startDate;
+        this.goalDate = goalDate;
         this.isDone = isDone;
         this.member = member;
     }
 
-    public static Bucket create(String title, LocalDate startDate, Member member) {
-        Bucket bucket = new Bucket(title, startDate, false, member);
+    public static Bucket create(String title, LocalDate goalDate, Member member) {
+        Bucket bucket = new Bucket(title, goalDate, false, member);
         bucket.createdAt = LocalDateTime.now();
         return bucket;
     }
@@ -85,12 +85,12 @@ public class Bucket {
         }
     }
 
-    public void update(Member member, String title, LocalDate startDate) {
+    public void update(Member member, String title, LocalDate goalDate) {
         this.validateOwner(member);
         this.bucketTopics.clear();
         this.bucketTodos.clear();
         this.title = title;
-        this.startDate = startDate;
+        this.goalDate = goalDate;
     }
 
     public void updateTopics(List<Topic> topics) {
