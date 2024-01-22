@@ -52,4 +52,8 @@ public class BucketTodo {
     public void setBucket(Bucket bucket) {
         this.bucket = bucket;
     }
+
+    public void done() {
+        this.isDone = true;
+    }
 }
