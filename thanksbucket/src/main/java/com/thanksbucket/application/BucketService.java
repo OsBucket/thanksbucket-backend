@@ -66,7 +66,7 @@ public class BucketService {
                 .toList());
         // TODO 리팩토링 필요
         bucket.updateIsDone(request.getIsDone());
-        return bucketId;
+        return bucket.getId();
     }
 
 

@@ -31,8 +31,8 @@ public class BucketController {
 
     @PostMapping("")
     public ResponseEntity<Void> create(@AuthenticationPrincipal User user, @Valid @RequestBody CreateBucketRequest request) {
-        bucketService.create(user.getUsername(), request);
-        return ResponseEntity.created(URI.create(null)).build();
+        Long bucketId = bucketService.create(user.getUsername(), request);
+        return ResponseEntity.created(URI.create("/api/buckets/"+bucketId)).build();
     }
 
     @GetMapping("")
@@ -48,7 +48,7 @@ public class BucketController {
     @PutMapping("/{bucketId}")
     public ResponseEntity<Void> update(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody UpdateBucketRequest request) {
         bucketService.update(user.getUsername(), bucketId, request);
-        return ResponseEntity.created(null).build();
+        return ResponseEntity.created(URI.create("/api/buckets/"+bucketId)).build();
     }
 
     @DeleteMapping("/{bucketId}")
