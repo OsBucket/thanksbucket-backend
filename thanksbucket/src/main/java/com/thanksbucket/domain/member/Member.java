@@ -48,9 +48,6 @@ public class Member {
     @Column
     private LocalDate birthday;
 
-    @Column
-    private String job;
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Bucket> buckets = new ArrayList<>();
 
@@ -58,17 +55,17 @@ public class Member {
     @JoinColumn(name = "occupation_id")
     private Occupation occupation;
 
-    public Member(String memberId, String password, String nickname, LocalDate birthday, String job) {
+    public Member(String memberId, String password, String nickname, LocalDate birthday, Occupation occupation) {
         this.memberId = memberId;
         this.password = password;
         this.nickname = nickname;
         this.birthday = birthday;
-        this.job = job;
+        this.occupation = occupation;
     }
 
-    public static Member signup(PasswordEncoder passwordEncoder, String memberId, String password, String nickname, LocalDate birthday, String job) {
+    public static Member signup(PasswordEncoder passwordEncoder, String memberId, String password, String nickname, LocalDate birthday, Occupation occupation) {
         password = passwordEncoder.encode(password);
-        Member member = new Member(memberId, password, nickname, birthday, job);
+        Member member = new Member(memberId, password, nickname, birthday, occupation);
         member.createdAt = LocalDateTime.now();
         return member;
     }
