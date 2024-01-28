@@ -1,12 +1,16 @@
 package com.thanksbucket.domain.member;
 
 import com.thanksbucket.domain.bucket.Bucket;
+import com.thanksbucket.domain.occupation.Occupation;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -48,7 +52,11 @@ public class Member {
     private String job;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    List<Bucket> buckets = new ArrayList<>();
+    private List<Bucket> buckets = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "occupation_id")
+    private Occupation occupation;
 
     public Member(String memberId, String password, String nickname, LocalDate birthday, String job) {
         this.memberId = memberId;
