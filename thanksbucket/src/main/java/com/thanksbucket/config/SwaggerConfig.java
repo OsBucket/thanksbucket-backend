@@ -16,7 +16,9 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,17 +32,27 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Configuration
 @EnableWebMvc
 public class SwaggerConfig {
+    @Value("${swagger.api.title}")
+    private String title;
+    @Value("${swagger.api.description}")
+    private String description;
+    @Value("${swagger.api.url}")
+    private String url;
+
     @Bean
     public OpenAPI openAPI() {
         Info info = new Info()
-                .title("ThanksBucket API")
-                .description("ThanksBucket API")
+                .title(title)
+                .description(description)
                 .version("v1");
+        Server server = new Server().url(url);
 
         SecurityScheme securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.COOKIE)
@@ -49,6 +61,7 @@ public class SwaggerConfig {
                 .addList("JSESSIONID");
 
         return new OpenAPI()
+                .servers(List.of(server))
                 .components(new Components().addSecuritySchemes("JSESSIONID", securityScheme))
                 .addSecurityItem(securityRequirement)
                 .info(info);
