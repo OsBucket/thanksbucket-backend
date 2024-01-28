@@ -1,6 +1,9 @@
 package com.thanksbucket.ui.api;
 
 import com.thanksbucket.application.AuthService;
+import com.thanksbucket.domain.member.Member;
+import com.thanksbucket.security.service.MemberContext;
+import com.thanksbucket.ui.dto.ProfileResponse;
 import com.thanksbucket.ui.dto.SignupRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
@@ -40,7 +43,8 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<String> profile(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(user.getUsername());
+    public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal MemberContext memberContext) {
+        Member member = memberContext.getMember();
+        return ResponseEntity.ok(new ProfileResponse(member.getId(), member.getNickname()));
     }
 }
