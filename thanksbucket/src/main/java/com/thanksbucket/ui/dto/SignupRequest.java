@@ -27,5 +27,5 @@ public class SignupRequest {
     @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
     private LocalDate birthday;
 
-    private String job;
+    private Long occupationId;
 }
