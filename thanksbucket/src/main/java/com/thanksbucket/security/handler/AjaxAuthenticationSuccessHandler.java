@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.thanksbucket.common.response.SuccessResponse;
 import com.thanksbucket.security.service.MemberContext;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -33,6 +34,8 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
         HttpSession session = request.getSession();
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
 
+        this.addJSESSIONCookie(request, response);
+
         log.info("로그인 성공: user:{}, JSESSIONID:{}", memberContext.getMember().getMemberId(), session.getId());
         objectMapper.registerModule(new JavaTimeModule()).writeValue(response.getWriter(),
                 SuccessResponse.builder()
@@ -40,5 +43,19 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
                         .data(null)
                         .build()
         );
+    }
+
+    private void addJSESSIONCookie(HttpServletRequest request, HttpServletResponse response) {
+        final String SESSION_COOKIE_KEY = "JSESSIONID";
+        final int SESSION_EXPIRE_TIME = 60 * 60 * 24 * 365;
+        final String SESSION_PATH = "/";
+
+        HttpSession session = request.getSession();
+        Cookie savedCookie = new Cookie(SESSION_COOKIE_KEY, session.getId());
+        savedCookie.setMaxAge(SESSION_EXPIRE_TIME);
+        savedCookie.setSecure(true);
+        savedCookie.setPath(SESSION_PATH);
+        savedCookie.setHttpOnly(true);
+        response.addCookie(savedCookie);
     }
 }
