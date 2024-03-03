@@ -36,7 +36,7 @@ public class BucketTemplate {
     @OneToMany(mappedBy = "bucketTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BucketTemplateTopic> bucketTemplateTopics = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column
     private String bucketTodoNames;
 
     public BucketTemplate(String bucketName, List<BucketTemplateTopic> bucketTemplateTopics, String bucketTodoNames) {
