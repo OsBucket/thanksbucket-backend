@@ -3,6 +3,7 @@ package com.thanksbucket.security.token;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
@@ -12,18 +13,26 @@ public class AjaxAuthenticationToken extends AbstractAuthenticationToken {
     private final Object principal;
     private final Object credentials;
 
-    public AjaxAuthenticationToken(Object principal, Object credentials) {
+    private AjaxAuthenticationToken(Object principal, Object credentials) {
         super(null);
         this.principal = principal;
         this.credentials = credentials;
         setAuthenticated(false);
     }
 
-    public AjaxAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+    private AjaxAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         this.credentials = credentials;
         super.setAuthenticated(true);
+    }
+
+    public static AjaxAuthenticationToken unauthenticated(String memberId, String password) {
+        return new AjaxAuthenticationToken(memberId, password);
+    }
+
+    public static AjaxAuthenticationToken authenticated(UserDetails principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+        return new AjaxAuthenticationToken(principal, credentials, authorities);
     }
 
 
@@ -37,6 +46,7 @@ public class AjaxAuthenticationToken extends AbstractAuthenticationToken {
         return this.principal;
     }
 
+    @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
         if (isAuthenticated) {
             throw new IllegalArgumentException(

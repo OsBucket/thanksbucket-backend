@@ -17,6 +17,8 @@ import java.io.IOException;
 
 public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingFilter {
     private static final String LOGIN_PATH = "/api/auth/login";
+    public static final String USERNAME_PARAMETER = "memberId";
+    public static final String PASSWORD_PARAMETER = "password";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -37,15 +39,15 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
             throw new IllegalArgumentException("memberId or password is empty");
         }
 
-        AjaxAuthenticationToken ajaxAuthenticationToken = new AjaxAuthenticationToken(loginDto.getMemberId(), loginDto.getPassword());
+        Authentication ajaxAuthenticationToken = AjaxAuthenticationToken.unauthenticated(loginDto.getMemberId(), loginDto.getPassword());
         return getAuthenticationManager().authenticate(ajaxAuthenticationToken);
     }
 
     public final String getUsernameParameter() {
-        return "memberId";
+        return USERNAME_PARAMETER;
     }
 
     public final String getPasswordParameter() {
-        return "password";
+        return PASSWORD_PARAMETER;
     }
 }

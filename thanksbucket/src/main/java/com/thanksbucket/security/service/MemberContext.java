@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.User;
 import java.util.Collection;
 
 public class MemberContext extends User {
-    private Member member;
+    private final Member member;
 
     public MemberContext(Member member, Collection<? extends GrantedAuthority> authorities) {
         super(member.getMemberId(), member.getPassword(), authorities);

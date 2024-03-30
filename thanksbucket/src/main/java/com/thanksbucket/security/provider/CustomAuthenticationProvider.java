@@ -5,7 +5,6 @@ import com.thanksbucket.security.token.AjaxAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,8 +27,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberContext, null, memberContext.getAuthorities());
-        return authenticationToken;
+        return AjaxAuthenticationToken.authenticated(memberContext, authentication.getCredentials(), memberContext.getAuthorities());
     }
 
     @Override
