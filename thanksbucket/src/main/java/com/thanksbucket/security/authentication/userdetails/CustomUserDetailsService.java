@@ -1,4 +1,4 @@
-package com.thanksbucket.security.service;
+package com.thanksbucket.security.authentication.userdetails;
 
 import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.member.MemberRepository;
@@ -33,6 +33,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         List<GrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        return new MemberContext(member, roles);
+        return new AuthMemberContext(member, roles);
     }
 }

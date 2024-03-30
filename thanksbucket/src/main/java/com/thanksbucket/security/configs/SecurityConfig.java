@@ -1,6 +1,7 @@
 package com.thanksbucket.security.configs;
 
-import com.thanksbucket.security.filter.AjaxLoginProcessingFilter;
+import com.thanksbucket.security.authentication.CustomAuthenticationProcessingFilter;
+import com.thanksbucket.security.authentication.www.CustomUnauthorizedEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +11,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -24,29 +23,23 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final AuthenticationFailureHandler authenticationFailureHandler;
-    private final AccessDeniedHandler accessDeniedHandler;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 //TODO 권한 조정 필요
-                .authorizeHttpRequests((authorize) -> authorize
+                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/api/health").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/signup","/api/occupations","/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/occupations", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
                 )
-                .exceptionHandling((exceptionHandling) -> {
-                    exceptionHandling.accessDeniedHandler(accessDeniedHandler);
-                    exceptionHandling.authenticationEntryPoint(authenticationEntryPoint);
-                })
-                .sessionManagement((sessionManagement) -> {
-                    sessionManagement.maximumSessions(1)
-                            .maxSessionsPreventsLogin(true);
-                })
-                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true))
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
@@ -63,11 +56,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
-        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
-        ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        ajaxLoginProcessingFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-        ajaxLoginProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
-        return ajaxLoginProcessingFilter;
+    public AbstractAuthenticationProcessingFilter customAuthenticationProcessingFilter() throws Exception {
+        AbstractAuthenticationProcessingFilter customAuthenticationProcessingFilter = new CustomAuthenticationProcessingFilter();
+        customAuthenticationProcessingFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+        customAuthenticationProcessingFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+        customAuthenticationProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        return customAuthenticationProcessingFilter;
     }
 }

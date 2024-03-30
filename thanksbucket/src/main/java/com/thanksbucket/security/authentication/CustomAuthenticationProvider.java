@@ -1,11 +1,10 @@
-package com.thanksbucket.security.provider;
+package com.thanksbucket.security.authentication;
 
-import com.thanksbucket.security.service.MemberContext;
-import com.thanksbucket.security.token.AjaxAuthenticationToken;
+import com.thanksbucket.security.authentication.userdetails.AuthMemberContext;
+import com.thanksbucket.security.authentication.CustomAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,17 +22,16 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
 
-        MemberContext memberContext = (MemberContext) userDetailsService.loadUserByUsername(username);
-        if (!passwordEncoder.matches(password, memberContext.getPassword())) {
+        AuthMemberContext authMemberContext = (AuthMemberContext) userDetailsService.loadUserByUsername(username);
+        if (!passwordEncoder.matches(password, authMemberContext.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberContext, null, memberContext.getAuthorities());
-        return authenticationToken;
+        return CustomAuthenticationToken.authenticated(authMemberContext, authentication.getCredentials(), authMemberContext.getAuthorities());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(AjaxAuthenticationToken.class);
+        return authentication.equals(CustomAuthenticationToken.class);
     }
 }

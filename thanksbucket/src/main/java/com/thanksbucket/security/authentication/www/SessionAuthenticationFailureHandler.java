@@ -1,4 +1,4 @@
-package com.thanksbucket.security.handler;
+package com.thanksbucket.security.authentication.www;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-public class AjaxAuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class SessionAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

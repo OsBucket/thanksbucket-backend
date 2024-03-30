@@ -1,9 +1,9 @@
-package com.thanksbucket.security.handler;
+package com.thanksbucket.security.authentication.www;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.thanksbucket.common.response.SuccessResponse;
-import com.thanksbucket.security.service.MemberContext;
+import com.thanksbucket.security.authentication.userdetails.AuthMemberContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,12 +22,12 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class SessionAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        MemberContext memberContext = (MemberContext) authentication.getPrincipal();
+        AuthMemberContext authMemberContext = (AuthMemberContext) authentication.getPrincipal();
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
@@ -36,7 +36,7 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
         this.addJSESSIONCookie(request, response);
 
-        log.info("로그인 성공: user:{}, JSESSIONID:{}", memberContext.getMember().getMemberId(), session.getId());
+        log.info("로그인 성공: user:{}, JSESSIONID:{}", authMemberContext.getMember().getMemberId(), session.getId());
         objectMapper.registerModule(new JavaTimeModule()).writeValue(response.getWriter(),
                 SuccessResponse.builder()
                         .path(request.getRequestURI())

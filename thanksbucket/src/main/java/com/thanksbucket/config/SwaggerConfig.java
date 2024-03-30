@@ -1,6 +1,6 @@
 package com.thanksbucket.config;
 
-import com.thanksbucket.security.filter.AjaxLoginProcessingFilter;
+import com.thanksbucket.security.authentication.CustomAuthenticationProcessingFilter;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -32,7 +32,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,10 +73,10 @@ public class SwaggerConfig {
         FilterChainProxy filterChainProxy = applicationContext.getBean(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME, FilterChainProxy.class);
         return openAPI -> {
             for (SecurityFilterChain filterChain : filterChainProxy.getFilterChains()) {
-                Optional<AjaxLoginProcessingFilter> optionalFilter =
+                Optional<CustomAuthenticationProcessingFilter> optionalFilter =
                         filterChain.getFilters().stream()
-                                .filter(AjaxLoginProcessingFilter.class::isInstance)
-                                .map(AjaxLoginProcessingFilter.class::cast)
+                                .filter(CustomAuthenticationProcessingFilter.class::isInstance)
+                                .map(CustomAuthenticationProcessingFilter.class::cast)
                                 .findAny();
                 Optional<DefaultLoginPageGeneratingFilter> optionalDefaultLoginPageGeneratingFilter =
                         filterChain.getFilters().stream()
@@ -85,11 +84,11 @@ public class SwaggerConfig {
                                 .map(DefaultLoginPageGeneratingFilter.class::cast)
                                 .findAny();
                 if (optionalFilter.isPresent()) {
-                    AjaxLoginProcessingFilter ajaxLoginProcessingFilter = optionalFilter.get();
+                    CustomAuthenticationProcessingFilter customAuthenticationProcessingFilter = optionalFilter.get();
                     Operation operation = new Operation();
                     Schema<?> schema = new ObjectSchema()
-                            .addProperty(ajaxLoginProcessingFilter.getUsernameParameter(), new StringSchema())
-                            .addProperty(ajaxLoginProcessingFilter.getPasswordParameter(), new StringSchema());
+                            .addProperty(customAuthenticationProcessingFilter.getUsernameParameter(), new StringSchema())
+                            .addProperty(customAuthenticationProcessingFilter.getPasswordParameter(), new StringSchema());
                     String mediaType = org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 //                    if (optionalDefaultLoginPageGeneratingFilter.isPresent()) {
 //                        DefaultLoginPageGeneratingFilter defaultLoginPageGeneratingFilter = optionalDefaultLoginPageGeneratingFilter.get();
@@ -114,7 +113,7 @@ public class SwaggerConfig {
                     try {
                         Field requestMatcherField = AbstractAuthenticationProcessingFilter.class.getDeclaredField("requiresAuthenticationRequestMatcher");
                         requestMatcherField.setAccessible(true);
-                        AntPathRequestMatcher requestMatcher = (AntPathRequestMatcher) requestMatcherField.get(ajaxLoginProcessingFilter);
+                        AntPathRequestMatcher requestMatcher = (AntPathRequestMatcher) requestMatcherField.get(customAuthenticationProcessingFilter);
                         String loginPath = requestMatcher.getPattern();
                         requestMatcherField.setAccessible(false);
                         openAPI.getPaths().addPathItem(loginPath, pathItem);
