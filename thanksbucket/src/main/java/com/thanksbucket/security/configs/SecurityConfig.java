@@ -2,27 +2,28 @@ package com.thanksbucket.security.configs;
 
 import com.thanksbucket.security.authentication.CustomAuthenticationProcessingFilter;
 import com.thanksbucket.security.authentication.www.CustomUnauthorizedEntryPoint;
+import com.thanksbucket.security.authentication.www.session.SessionAuthenticationFailureHandler;
+import com.thanksbucket.security.authentication.www.session.SessionAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
+@Primary
 public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
-    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,8 +39,9 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
                 .sessionManagement(sessionManagement -> sessionManagement
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                        .maximumSessions(1)
+//                        .maxSessionsPreventsLogin(true))
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
@@ -56,11 +58,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AbstractAuthenticationProcessingFilter customAuthenticationProcessingFilter() throws Exception {
-        AbstractAuthenticationProcessingFilter customAuthenticationProcessingFilter = new CustomAuthenticationProcessingFilter();
-        customAuthenticationProcessingFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        customAuthenticationProcessingFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-        customAuthenticationProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
-        return customAuthenticationProcessingFilter;
+    public AbstractAuthenticationProcessingFilter sessionFilter() throws Exception {
+        AbstractAuthenticationProcessingFilter sessionAuthenticationProcessingFilter = new CustomAuthenticationProcessingFilter();
+        sessionAuthenticationProcessingFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+        sessionAuthenticationProcessingFilter.setAuthenticationSuccessHandler(new SessionAuthenticationSuccessHandler());
+        sessionAuthenticationProcessingFilter.setAuthenticationFailureHandler(new SessionAuthenticationFailureHandler());
+        return sessionAuthenticationProcessingFilter;
     }
 }
