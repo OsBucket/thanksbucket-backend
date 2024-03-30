@@ -12,9 +12,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -29,21 +29,18 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 //TODO 권한 조정 필요
-                .authorizeHttpRequests((authorize) -> authorize
+                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/api/health").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/occupations", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
                 )
-                .exceptionHandling((exceptionHandling) -> {
-                    exceptionHandling.authenticationEntryPoint(authenticationEntryPoint);
-                })
-                .sessionManagement((sessionManagement) -> {
-                    sessionManagement.maximumSessions(1)
-                            .maxSessionsPreventsLogin(true);
-                })
-                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(authenticationEntryPoint))
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true))
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
@@ -60,8 +57,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CustomAuthenticationProcessingFilter ajaxLoginProcessingFilter() throws Exception {
-        CustomAuthenticationProcessingFilter customAuthenticationProcessingFilter = new CustomAuthenticationProcessingFilter();
+    public AbstractAuthenticationProcessingFilter customAuthenticationProcessingFilter() throws Exception {
+        AbstractAuthenticationProcessingFilter customAuthenticationProcessingFilter = new CustomAuthenticationProcessingFilter();
         customAuthenticationProcessingFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         customAuthenticationProcessingFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         customAuthenticationProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
