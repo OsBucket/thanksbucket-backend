@@ -1,6 +1,6 @@
 package com.thanksbucket.security.configs;
 
-import com.thanksbucket.security.filter.AjaxLoginProcessingFilter;
+import com.thanksbucket.security.authentication.CustomAuthenticationProcessingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +31,7 @@ public class SecurityConfig {
                 //TODO 권한 조정 필요
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/", "/api/health").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/signup","/api/occupations","/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/occupations", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
@@ -60,11 +60,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
-        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
-        ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        ajaxLoginProcessingFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-        ajaxLoginProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
-        return ajaxLoginProcessingFilter;
+    public CustomAuthenticationProcessingFilter ajaxLoginProcessingFilter() throws Exception {
+        CustomAuthenticationProcessingFilter customAuthenticationProcessingFilter = new CustomAuthenticationProcessingFilter();
+        customAuthenticationProcessingFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+        customAuthenticationProcessingFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
+        customAuthenticationProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        return customAuthenticationProcessingFilter;
     }
 }

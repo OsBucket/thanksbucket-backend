@@ -1,8 +1,7 @@
-package com.thanksbucket.security.filter;
+package com.thanksbucket.security.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thanksbucket.security.dto.LoginDto;
-import com.thanksbucket.security.token.AjaxAuthenticationToken;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,14 +14,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.IOException;
 
-public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingFilter {
+public class CustomAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
     private static final String LOGIN_PATH = "/api/auth/login";
     public static final String USERNAME_PARAMETER = "memberId";
     public static final String PASSWORD_PARAMETER = "password";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public AjaxLoginProcessingFilter() {
+    public CustomAuthenticationProcessingFilter() {
         super(new AntPathRequestMatcher(LOGIN_PATH));
     }
 
@@ -39,8 +38,8 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
             throw new IllegalArgumentException("memberId or password is empty");
         }
 
-        Authentication ajaxAuthenticationToken = AjaxAuthenticationToken.unauthenticated(loginDto.getMemberId(), loginDto.getPassword());
-        return getAuthenticationManager().authenticate(ajaxAuthenticationToken);
+        Authentication authenticationToken = CustomAuthenticationToken.unauthenticated(loginDto.getMemberId(), loginDto.getPassword());
+        return getAuthenticationManager().authenticate(authenticationToken);
     }
 
     public final String getUsernameParameter() {

@@ -1,9 +1,8 @@
-package com.thanksbucket.security.common;
+package com.thanksbucket.security.authentication.www;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.thanksbucket.common.response.ErrorResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,7 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-public class AjaxLoginAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
