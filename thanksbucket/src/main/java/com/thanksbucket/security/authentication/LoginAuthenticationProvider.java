@@ -1,10 +1,10 @@
 package com.thanksbucket.security.authentication;
 
 import com.thanksbucket.security.authentication.userdetails.AuthMemberContext;
-import com.thanksbucket.security.authentication.CustomAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+public class LoginAuthenticationProvider implements AuthenticationProvider {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -27,11 +27,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
-        return CustomAuthenticationToken.authenticated(authMemberContext, authentication.getCredentials(), authMemberContext.getAuthorities());
+        return UsernamePasswordAuthenticationToken.authenticated(authMemberContext, authentication.getCredentials(), authMemberContext.getAuthorities());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(CustomAuthenticationToken.class);
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 }
