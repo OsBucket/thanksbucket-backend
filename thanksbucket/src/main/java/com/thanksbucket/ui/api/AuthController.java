@@ -44,7 +44,7 @@ public class AuthController {
 
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal AuthMember authMember) {
-        Member member = authMember.getMember();
+        Member member = authService.findByMemberId(authMember.getUsername());
         return ResponseEntity.ok(new ProfileResponse(member.getId(), member.getNickname()));
     }
 }

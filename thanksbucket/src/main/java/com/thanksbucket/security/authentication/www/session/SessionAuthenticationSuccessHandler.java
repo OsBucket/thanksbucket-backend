@@ -34,7 +34,7 @@ public class SessionAuthenticationSuccessHandler implements AuthenticationSucces
 
         this.addJSESSIONCookie(request, response);
 
-        log.info("로그인 성공: user:{}, JSESSIONID:{}", authMember.getMember().getMemberId(), session.getId());
+        log.info("로그인 성공: user:{}, JSESSIONID:{}", authMember.getUsername(), session.getId());
         objectMapper.registerModule(new JavaTimeModule()).writeValue(response.getWriter(),
                 SuccessResponse.builder()
                         .path(request.getRequestURI())
