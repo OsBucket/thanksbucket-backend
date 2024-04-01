@@ -68,8 +68,8 @@ public class SwaggerConfig {
                 .info(info);
     }
 
-    @Bean
-    @Lazy(false)
+//    @Bean
+//    @Lazy(false)
     //org.springdoc.security.SpringdocSecurityConfiguration
     public OpenApiCustomizer springSecurityLoginEndpointCustomiser(ApplicationContext applicationContext) {
         FilterChainProxy filterChainProxy = applicationContext.getBean(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME, FilterChainProxy.class);
