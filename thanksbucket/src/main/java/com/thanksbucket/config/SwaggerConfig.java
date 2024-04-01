@@ -68,7 +68,7 @@ public class SwaggerConfig {
                 .info(info);
     }
 
-//    @Bean
+    @Bean
 //    @Lazy(false)
     //org.springdoc.security.SpringdocSecurityConfiguration
     public OpenApiCustomizer springSecurityLoginEndpointCustomiser(ApplicationContext applicationContext) {
