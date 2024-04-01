@@ -46,7 +46,9 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
                 .sessionManagement(sessionManagement -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true))
                 .authenticationProvider(new LoginAuthenticationProvider(passwordEncoder(), userDetailsService))
                 .addFilterBefore(loginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable());
