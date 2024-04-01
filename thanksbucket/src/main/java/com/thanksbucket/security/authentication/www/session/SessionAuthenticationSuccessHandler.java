@@ -3,7 +3,7 @@ package com.thanksbucket.security.authentication.www.session;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.thanksbucket.common.response.SuccessResponse;
-import com.thanksbucket.security.authentication.userdetails.AuthMemberContext;
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +25,7 @@ public class SessionAuthenticationSuccessHandler implements AuthenticationSucces
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        AuthMemberContext authMemberContext = (AuthMemberContext) authentication.getPrincipal();
+        AuthMember authMember = (AuthMember) authentication.getPrincipal();
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
@@ -34,7 +34,7 @@ public class SessionAuthenticationSuccessHandler implements AuthenticationSucces
 
         this.addJSESSIONCookie(request, response);
 
-        log.info("로그인 성공: user:{}, JSESSIONID:{}", authMemberContext.getMember().getMemberId(), session.getId());
+        log.info("로그인 성공: user:{}, JSESSIONID:{}", authMember.getMember().getMemberId(), session.getId());
         objectMapper.registerModule(new JavaTimeModule()).writeValue(response.getWriter(),
                 SuccessResponse.builder()
                         .path(request.getRequestURI())

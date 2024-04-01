@@ -6,10 +6,10 @@ import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
 
-public class AuthMemberContext extends User {
+public class AuthMember extends User {
     private final Member member;
 
-    public AuthMemberContext(Member member, Collection<? extends GrantedAuthority> authorities) {
+    public AuthMember(Member member, Collection<? extends GrantedAuthority> authorities) {
         super(member.getMemberId(), member.getPassword(), authorities);
         this.member = member;
     }
