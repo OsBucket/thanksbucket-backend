@@ -3,8 +3,11 @@ package com.thanksbucket.security.configs;
 import com.thanksbucket.security.authentication.LoginAuthenticationFilter;
 import com.thanksbucket.security.authentication.LoginAuthenticationProvider;
 import com.thanksbucket.security.authentication.www.CustomUnauthorizedEntryPoint;
-import com.thanksbucket.security.authentication.www.session.SessionAuthenticationFailureHandler;
-import com.thanksbucket.security.authentication.www.session.SessionAuthenticationSuccessHandler;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationFailureHandler;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationFilter;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationSuccessHandler;
+import com.thanksbucket.security.authentication.www.jwt.JWTTokenProvider;
+import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,8 +33,9 @@ import java.util.Map;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final UserDetailsService userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final UserDetailsService userDetailsService;
+    private final JWTUtils jwtUtils;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -46,11 +50,13 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
                 .sessionManagement(sessionManagement -> sessionManagement
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                        .maximumSessions(1)
+//                        .maxSessionsPreventsLogin(true))
                 .authenticationProvider(new LoginAuthenticationProvider(passwordEncoder(), userDetailsService))
-                .addFilterBefore(loginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(new JWTTokenProvider(jwtUtils))
+                .addFilterBefore(loginFilter(authenticationConfiguration.getAuthenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter(authenticationConfiguration.getAuthenticationManager()), UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
@@ -86,8 +92,13 @@ public class SecurityConfig {
     @Bean
     public UsernamePasswordAuthenticationFilter loginFilter(AuthenticationManager authenticationManager) {
         UsernamePasswordAuthenticationFilter loginAuthenticationFilter = new LoginAuthenticationFilter(authenticationManager);
-        loginAuthenticationFilter.setAuthenticationSuccessHandler(new SessionAuthenticationSuccessHandler());
-        loginAuthenticationFilter.setAuthenticationFailureHandler(new SessionAuthenticationFailureHandler());
+        loginAuthenticationFilter.setAuthenticationSuccessHandler(new JWTAuthenticationSuccessHandler(jwtUtils));
+        loginAuthenticationFilter.setAuthenticationFailureHandler(new JWTAuthenticationFailureHandler());
         return loginAuthenticationFilter;
+    }
+
+    @Bean
+    public JWTAuthenticationFilter jwtFilter(AuthenticationManager authenticationManager) {
+        return new JWTAuthenticationFilter(authenticationManager);
     }
 }
