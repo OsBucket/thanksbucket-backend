@@ -9,10 +9,11 @@ import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationSuccess
 import com.thanksbucket.security.authentication.www.jwt.JWTTokenProvider;
 import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,10 +31,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final AuthenticationConfiguration authenticationConfiguration;
+    private final ApplicationContext applicationContext;
     private final UserDetailsService userDetailsService;
     private final JWTUtils jwtUtils;
 
@@ -41,7 +42,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/api/health").permitAll()
+                        .requestMatchers("/", "/api/health", "/login").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/occupations", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
@@ -51,14 +52,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                        .maximumSessions(1)
-//                        .maxSessionsPreventsLogin(true))
-                .authenticationProvider(new LoginAuthenticationProvider(passwordEncoder(), userDetailsService))
-                .authenticationProvider(new JWTTokenProvider(jwtUtils))
-                .addFilterBefore(loginFilter(authenticationConfiguration.getAuthenticationManager()), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtFilter(authenticationConfiguration.getAuthenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAfter(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable());
-
         return http.build();
     }
 
@@ -85,20 +81,32 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public JWTTokenProvider jwtTokenProvider(JWTUtils jwtUtils) {
+        return new JWTTokenProvider(jwtUtils);
     }
 
     @Bean
-    public UsernamePasswordAuthenticationFilter loginFilter(AuthenticationManager authenticationManager) {
-        UsernamePasswordAuthenticationFilter loginAuthenticationFilter = new LoginAuthenticationFilter(authenticationManager);
+    public LoginAuthenticationProvider loginAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
+        return new LoginAuthenticationProvider(passwordEncoder, userDetailsService);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(jwtTokenProvider(jwtUtils));
+        authenticationManagerBuilder.authenticationProvider(loginAuthenticationProvider(passwordEncoder(), userDetailsService));
+        return authenticationManagerBuilder.build();
+    }
+
+
+    private UsernamePasswordAuthenticationFilter loginFilter() throws Exception {
+        UsernamePasswordAuthenticationFilter loginAuthenticationFilter = new LoginAuthenticationFilter(authenticationManager(null));
         loginAuthenticationFilter.setAuthenticationSuccessHandler(new JWTAuthenticationSuccessHandler(jwtUtils));
         loginAuthenticationFilter.setAuthenticationFailureHandler(new JWTAuthenticationFailureHandler());
         return loginAuthenticationFilter;
     }
 
-    @Bean
-    public JWTAuthenticationFilter jwtFilter(AuthenticationManager authenticationManager) {
-        return new JWTAuthenticationFilter(authenticationManager);
+    private JWTAuthenticationFilter jwtFilter() throws Exception {
+        return new JWTAuthenticationFilter(authenticationManager(null));
     }
 }
