@@ -10,6 +10,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -18,7 +19,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static com.thanksbucket.security.authentication.userdetails.AuthMember.DEFAULT_ROLE;
 
 @Component
 @Slf4j
@@ -70,7 +72,9 @@ public class JWTUtils {
         Claims claims = decodeToken(token);
         List<Map<String, GrantedAuthority>> roles = claims.get(CLAIM_AUTHORITIES_KEY, List.class);
         // TODO Authorities 반환값이 이상함 확인 필요
-        return roles.stream().map(authorities -> authorities.get("authority")).collect(Collectors.toList());
+        // TODO 임시 하드 코딩
+        return List.of(new SimpleGrantedAuthority(DEFAULT_ROLE));
+//        return roles.stream().map(authorities -> authorities.get("authority")).collect(Collectors.toList());
     }
 
     public String getUsername(String token) {
