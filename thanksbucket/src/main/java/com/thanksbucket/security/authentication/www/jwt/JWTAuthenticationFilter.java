@@ -27,6 +27,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // TODO 검증은 filter말고 provider에서
         try {
             log.debug("JWT Filter PASS START");
             String header = request.getHeader(AUTHORIZATION_HEADER);
@@ -42,12 +43,12 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             Authentication authResult = this.authenticationManager.authenticate(unauthenticated);
 
             SecurityContextHolder.getContext().setAuthentication(authResult);
-            filterChain.doFilter(request, response);
         } catch (InternalAuthenticationServiceException failed) {
             this.logger.error("An internal error occurred while trying to authenticate the user.", failed);
         } catch (AuthenticationException ex) {
             this.logger.error(ex.getMessage());
         }
+        filterChain.doFilter(request, response);
     }
 
 }
