@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.thanksbucket.common.response.SuccessResponse;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
+import com.thanksbucket.security.dto.JWTResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,11 +34,13 @@ public class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHan
 
         String jwtToken = jwtUtils.generateToken(authMember.getUsername(), authMember.getAuthorities());
 
-        log.info("로그인 성공: user: {}, JWT-Token: {}", authMember.getUsername(), jwtToken);
+        JWTResponse body = new JWTResponse(authMember.getUsername(), jwtToken, jwtUtils.getExpireDate());
+        log.info("로그인 성공: {}", body);
+        //TODO 유효기간 가져오는 하드코딩
         objectMapper.registerModule(new JavaTimeModule()).writeValue(response.getWriter(),
                 SuccessResponse.builder()
                         .path(request.getRequestURI())
-                        .data(null)
+                        .data(body)
                         .build()
         );
     }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -27,13 +28,13 @@ import static com.thanksbucket.security.authentication.userdetails.AuthMember.DE
 public class JWTUtils {
     private static final String CLAIM_AUTHORITIES_KEY = "AUTH";
     private final String SECRET_KEY;
-    private final long EXPIRE_TIME;
+    private final long EXPIRE_MINUTES;
 
     private final Key key;
 
-    public JWTUtils(@Value("${jwt.token.secret-key}") String secretKey, @Value("${jwt.token.validity-in-seconds}") long expireTime) {
+    public JWTUtils(@Value("${jwt.token.secret-key}") String secretKey, @Value("${jwt.token.access-token-expire-minutes}") long expireMinutes) {
         this.SECRET_KEY = secretKey;
-        this.EXPIRE_TIME = expireTime;
+        this.EXPIRE_MINUTES = expireMinutes;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
@@ -42,7 +43,7 @@ public class JWTUtils {
                 .issuer("ThanksBucket")
                 .subject("Authorization")
                 .audience().add(username).and()
-                .expiration(getExpireDate())
+                .expiration(java.sql.Date.valueOf(getExpireDate().toLocalDate()))
                 .notBefore(new Date())
                 .issuedAt(new Date())
                 .id(username)
@@ -83,8 +84,7 @@ public class JWTUtils {
         return id;
     }
 
-    private Date getExpireDate() {
-        Date now = new Date();
-        return new Date(now.getTime() + EXPIRE_TIME);
+    public LocalDateTime getExpireDate() {
+        return LocalDateTime.now().plusMinutes(EXPIRE_MINUTES);
     }
 }

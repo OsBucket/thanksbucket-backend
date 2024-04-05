@@ -1,7 +1,7 @@
 package com.thanksbucket.security.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thanksbucket.security.dto.LoginDto;
+import com.thanksbucket.security.dto.LoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,12 +32,12 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
         try {
             this.validateMethod(request);
 
-            LoginDto loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.class);
-            if (loginDto.getMemberId().isBlank() || loginDto.getPassword().isBlank()) {
+            LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
+            if (loginRequest.getMemberId().isBlank() || loginRequest.getPassword().isBlank()) {
                 throw new AuthenticationServiceException("ID 또는 PASSWORD가 비어있습니다.");
             }
 
-            Authentication authRequest = UsernamePasswordAuthenticationToken.unauthenticated(loginDto.getMemberId(), loginDto.getPassword());
+            Authentication authRequest = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.getMemberId(), loginRequest.getPassword());
             return getAuthenticationManager().authenticate(authRequest);
 
         } catch (IOException ex) {
