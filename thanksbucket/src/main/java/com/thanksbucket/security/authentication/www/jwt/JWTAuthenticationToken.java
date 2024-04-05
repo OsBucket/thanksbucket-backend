@@ -1,5 +1,6 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
@@ -9,20 +10,20 @@ import java.util.Collection;
 public class JWTAuthenticationToken extends AbstractAuthenticationToken {
     private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
-    private final String username;
-    private final String token;
+    private final AuthMember principal;
+    private final String credentials;
 
-    private JWTAuthenticationToken(String username, String token) {
+    private JWTAuthenticationToken(AuthMember principal, String credentials) {
         super(null);
-        this.username = username;
-        this.token = token;
+        this.principal = principal;
+        this.credentials = credentials;
         setAuthenticated(false);
     }
 
-    private JWTAuthenticationToken(String username, String token, Collection<? extends GrantedAuthority> authorities) {
+    private JWTAuthenticationToken(AuthMember principal, String credentials, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
-        this.username = username;
-        this.token = token;
+        this.principal = principal;
+        this.credentials = credentials;
         super.setAuthenticated(true);
     }
 
@@ -30,19 +31,19 @@ public class JWTAuthenticationToken extends AbstractAuthenticationToken {
         return new JWTAuthenticationToken(null, token);
     }
 
-    public static JWTAuthenticationToken authenticated(String username, String token, Collection<? extends GrantedAuthority> authorities) {
-        return new JWTAuthenticationToken(username, token, authorities);
+    public static JWTAuthenticationToken authenticated(AuthMember authMember, String token, Collection<? extends GrantedAuthority> authorities) {
+        return new JWTAuthenticationToken(authMember, token, authorities);
     }
 
 
     @Override
     public Object getCredentials() {
-        return this.token;
+        return this.credentials;
     }
 
     @Override
     public Object getPrincipal() {
-        return this.username;
+        return this.principal;
     }
 
     @Override

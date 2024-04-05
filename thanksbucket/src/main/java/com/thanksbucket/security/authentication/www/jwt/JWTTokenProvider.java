@@ -1,5 +1,6 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -20,8 +21,8 @@ public class JWTTokenProvider implements AuthenticationProvider {
         String token = (String) authentication.getCredentials();
         String username = jwtUtils.getUsername(token);
         Collection<GrantedAuthority> authorities = jwtUtils.getAuthorities(token);
-        log.info("authorites = {}", authorities);
-        return JWTAuthenticationToken.authenticated(username, token, authorities);
+        AuthMember authMember = new AuthMember(username, token, authorities);
+        return JWTAuthenticationToken.authenticated(authMember, token, authorities);
     }
 
     @Override
