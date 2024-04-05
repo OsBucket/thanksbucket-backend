@@ -19,7 +19,8 @@ import java.io.IOException;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer";
-    private AuthenticationManager authenticationManager;
+
+    private final AuthenticationManager authenticationManager;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
@@ -34,6 +35,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             if (header == null) {
                 throw new AuthenticationServiceException("인증에 실패하였습니다.");
             }
+            log.info("입력 헤더 - Authorization : {}", header);
             String[] split = header.split(" ");
             if (split.length < 2 && !split[0].equals(TOKEN_PREFIX)) {
                 throw new AuthenticationServiceException("유효하지 않은 토큰 형식입니다.");

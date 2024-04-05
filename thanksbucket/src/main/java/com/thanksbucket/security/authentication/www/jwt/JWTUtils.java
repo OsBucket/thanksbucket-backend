@@ -9,6 +9,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class JWTUtils {
                 .issuer("ThanksBucket")
                 .subject("Authorization")
                 .audience().add(username).and()
-                .expiration(java.sql.Date.valueOf(getExpireDate().toLocalDate()))
+                .expiration(java.sql.Timestamp.valueOf(getExpireDate()))
                 .notBefore(new Date())
                 .issuedAt(new Date())
                 .id(username)
@@ -60,13 +61,12 @@ public class JWTUtils {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
+            throw new AuthenticationServiceException("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
+            throw new AuthenticationServiceException("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
+            throw new AuthenticationServiceException("지원되지 않는 JWT 토큰입니다.");
         }
-        throw new IllegalArgumentException("JWT 토큰이 잘못되었습니다.");
     }
 
     public Collection<GrantedAuthority> getAuthorities(String token) {

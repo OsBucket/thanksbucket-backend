@@ -4,6 +4,7 @@ import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -17,7 +18,7 @@ public class JWTTokenProvider implements AuthenticationProvider {
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) {
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = (String) authentication.getCredentials();
         String username = jwtUtils.getUsername(token);
         Collection<GrantedAuthority> authorities = jwtUtils.getAuthorities(token);
