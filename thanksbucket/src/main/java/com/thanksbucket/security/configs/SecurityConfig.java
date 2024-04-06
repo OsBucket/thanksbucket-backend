@@ -3,13 +3,16 @@ package com.thanksbucket.security.configs;
 import com.thanksbucket.security.authentication.LoginAuthenticationFilter;
 import com.thanksbucket.security.authentication.LoginAuthenticationProvider;
 import com.thanksbucket.security.authentication.www.CustomUnauthorizedEntryPoint;
-import com.thanksbucket.security.authentication.www.session.SessionAuthenticationFailureHandler;
-import com.thanksbucket.security.authentication.www.session.SessionAuthenticationSuccessHandler;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationFailureHandler;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationFilter;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationSuccessHandler;
+import com.thanksbucket.security.authentication.www.jwt.JWTTokenProvider;
+import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,11 +30,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
-    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTUtils jwtUtils;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -46,11 +49,9 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
                 .sessionManagement(sessionManagement -> sessionManagement
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true))
-                .authenticationProvider(new LoginAuthenticationProvider(passwordEncoder(), userDetailsService))
-                .addFilterBefore(loginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
@@ -79,15 +80,31 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public JWTTokenProvider jwtTokenProvider(JWTUtils jwtUtils) {
+        return new JWTTokenProvider(jwtUtils);
     }
 
     @Bean
-    public UsernamePasswordAuthenticationFilter loginFilter(AuthenticationManager authenticationManager) {
-        UsernamePasswordAuthenticationFilter loginAuthenticationFilter = new LoginAuthenticationFilter(authenticationManager);
-        loginAuthenticationFilter.setAuthenticationSuccessHandler(new SessionAuthenticationSuccessHandler());
-        loginAuthenticationFilter.setAuthenticationFailureHandler(new SessionAuthenticationFailureHandler());
+    public LoginAuthenticationProvider loginAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
+        return new LoginAuthenticationProvider(passwordEncoder, userDetailsService);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(jwtTokenProvider(jwtUtils));
+        authenticationManagerBuilder.authenticationProvider(loginAuthenticationProvider(passwordEncoder(), userDetailsService));
+        return authenticationManagerBuilder.build();
+    }
+
+    private UsernamePasswordAuthenticationFilter loginFilter() throws Exception {
+        UsernamePasswordAuthenticationFilter loginAuthenticationFilter = new LoginAuthenticationFilter(authenticationManager(null));
+        loginAuthenticationFilter.setAuthenticationSuccessHandler(new JWTAuthenticationSuccessHandler(jwtUtils));
+        loginAuthenticationFilter.setAuthenticationFailureHandler(new JWTAuthenticationFailureHandler());
         return loginAuthenticationFilter;
+    }
+
+    private JWTAuthenticationFilter jwtFilter() throws Exception {
+        return new JWTAuthenticationFilter(authenticationManager(null));
     }
 }

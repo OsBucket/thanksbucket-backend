@@ -1,6 +1,6 @@
 package com.thanksbucket.security.authentication;
 
-import com.thanksbucket.security.authentication.userdetails.AuthMemberContext;
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,12 +20,12 @@ public class SimpleLoginAuthenticationProvider implements AuthenticationProvider
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
 
-        AuthMemberContext authMemberContext = (AuthMemberContext) userDetailsService.loadUserByUsername(username);
-        if (!passwordEncoder.matches(password, authMemberContext.getPassword())) {
+        AuthMember authMember = (AuthMember) userDetailsService.loadUserByUsername(username);
+        if (!passwordEncoder.matches(password, authMember.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
-        return UsernamePasswordAuthenticationToken.authenticated(authMemberContext, authentication.getCredentials(), authMemberContext.getAuthorities());
+        return UsernamePasswordAuthenticationToken.authenticated(authMember, authentication.getCredentials(), authMember.getAuthorities());
     }
 
     @Override

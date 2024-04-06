@@ -1,38 +1,38 @@
-package com.thanksbucket.security.authentication;
+package com.thanksbucket.security.authentication.www.jwt;
 
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-public class CustomAuthenticationToken extends AbstractAuthenticationToken {
+public class JWTAuthenticationToken extends AbstractAuthenticationToken {
     private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
-    private final Object principal;
-    private final Object credentials;
+    private final AuthMember principal;
+    private final String credentials;
 
-    private CustomAuthenticationToken(Object principal, Object credentials) {
+    private JWTAuthenticationToken(AuthMember principal, String credentials) {
         super(null);
         this.principal = principal;
         this.credentials = credentials;
         setAuthenticated(false);
     }
 
-    private CustomAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+    private JWTAuthenticationToken(AuthMember principal, String credentials, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         this.credentials = credentials;
         super.setAuthenticated(true);
     }
 
-    public static CustomAuthenticationToken unauthenticated(String memberId, String password) {
-        return new CustomAuthenticationToken(memberId, password);
+    public static JWTAuthenticationToken unauthenticated(String token) {
+        return new JWTAuthenticationToken(null, token);
     }
 
-    public static CustomAuthenticationToken authenticated(UserDetails principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
-        return new CustomAuthenticationToken(principal, credentials, authorities);
+    public static JWTAuthenticationToken authenticated(AuthMember authMember, String token, Collection<? extends GrantedAuthority> authorities) {
+        return new JWTAuthenticationToken(authMember, token, authorities);
     }
 
 

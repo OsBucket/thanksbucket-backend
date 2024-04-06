@@ -55,21 +55,26 @@ public class SwaggerConfig {
                 .version("v1");
         Server server = new Server().url(url);
 
-        SecurityScheme securityScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.COOKIE)
-                .name("JSESSIONID");
+        String jwtSchemeName = "Bearer Authentication";
         SecurityRequirement securityRequirement = new SecurityRequirement()
-                .addList("JSESSIONID");
+                .addList(jwtSchemeName);
+        SecurityScheme securityScheme = new SecurityScheme()
+                .name(jwtSchemeName)
+                .type(SecurityScheme.Type.HTTP)
+                .bearerFormat("JWT")
+                .scheme("bearer");
+
+
 
         return new OpenAPI()
                 .servers(List.of(server))
-                .components(new Components().addSecuritySchemes("JSESSIONID", securityScheme))
+                .components(new Components().addSecuritySchemes(jwtSchemeName, securityScheme))
                 .addSecurityItem(securityRequirement)
                 .info(info);
     }
 
     @Bean
-//    @Lazy(false)
+    @Lazy(false)
     //org.springdoc.security.SpringdocSecurityConfiguration
     public OpenApiCustomizer springSecurityLoginEndpointCustomiser(ApplicationContext applicationContext) {
         FilterChainProxy filterChainProxy = applicationContext.getBean(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME, FilterChainProxy.class);
