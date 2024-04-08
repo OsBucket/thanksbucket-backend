@@ -21,9 +21,16 @@ public class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHan
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final JWTUtils jwtUtils;
+    private AuthenticationSuccessHandler addSuccessHandler;
 
     public JWTAuthenticationSuccessHandler(JWTUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
+    }
+
+    //TODO Session 하위호환성
+    public JWTAuthenticationSuccessHandler(JWTUtils jwtUtils, AuthenticationSuccessHandler addSuccessHandler) {
+        this.jwtUtils = jwtUtils;
+        this.addSuccessHandler = addSuccessHandler;
     }
 
     @Override
@@ -33,6 +40,9 @@ public class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHan
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         String jwtToken = jwtUtils.generateToken(authMember.getUsername(), authMember.getAuthorities());
+
+        //TODO Session 하위호환성
+        addSuccessHandler.onAuthenticationSuccess(request, response, authentication);
 
         JWTResponse body = new JWTResponse(authMember.getUsername(), jwtToken, jwtUtils.getExpireDate());
         log.info("로그인 성공: {}", body);
