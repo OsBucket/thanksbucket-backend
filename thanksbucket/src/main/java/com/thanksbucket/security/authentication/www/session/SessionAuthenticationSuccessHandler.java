@@ -26,8 +26,8 @@ public class SessionAuthenticationSuccessHandler implements AuthenticationSucces
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         AuthMember authMember = (AuthMember) authentication.getPrincipal();
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+//        response.setStatus(HttpStatus.OK.value());
+//        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         HttpSession session = request.getSession();
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
@@ -35,12 +35,12 @@ public class SessionAuthenticationSuccessHandler implements AuthenticationSucces
         this.addJSESSIONCookie(request, response);
 
         log.info("로그인 성공: user:{}, JSESSIONID:{}", authMember.getUsername(), session.getId());
-        objectMapper.registerModule(new JavaTimeModule()).writeValue(response.getWriter(),
-                SuccessResponse.builder()
-                        .path(request.getRequestURI())
-                        .data(null)
-                        .build()
-        );
+//        objectMapper.registerModule(new JavaTimeModule()).writeValue(response.getWriter(),
+//                SuccessResponse.builder()
+//                        .path(request.getRequestURI())
+//                        .data(null)
+//                        .build()
+//        );
     }
 
     private void addJSESSIONCookie(HttpServletRequest request, HttpServletResponse response) {

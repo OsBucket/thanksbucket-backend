@@ -8,6 +8,7 @@ import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationFilter;
 import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationSuccessHandler;
 import com.thanksbucket.security.authentication.www.jwt.JWTTokenProvider;
 import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
+import com.thanksbucket.security.authentication.www.session.SessionAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
@@ -49,7 +49,8 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
                 .sessionManagement(sessionManagement -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true))
                 .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable());
@@ -99,7 +100,7 @@ public class SecurityConfig {
 
     private UsernamePasswordAuthenticationFilter loginFilter() throws Exception {
         UsernamePasswordAuthenticationFilter loginAuthenticationFilter = new LoginAuthenticationFilter(authenticationManager(null));
-        loginAuthenticationFilter.setAuthenticationSuccessHandler(new JWTAuthenticationSuccessHandler(jwtUtils));
+        loginAuthenticationFilter.setAuthenticationSuccessHandler(new JWTAuthenticationSuccessHandler(jwtUtils, new SessionAuthenticationSuccessHandler()));
         loginAuthenticationFilter.setAuthenticationFailureHandler(new JWTAuthenticationFailureHandler());
         return loginAuthenticationFilter;
     }
