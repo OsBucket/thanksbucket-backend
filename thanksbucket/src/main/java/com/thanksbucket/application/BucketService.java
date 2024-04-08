@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,10 +45,8 @@ public class BucketService {
         return buckets.stream().map(BucketResponse::new).toList();
     }
 
-    public BucketResponse findById(String memberId, Long bucketId) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+    public BucketResponse findById(Long bucketId) {
         Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
-        bucket.validateOwner(member);
         return new BucketResponse(bucket);
     }
 
