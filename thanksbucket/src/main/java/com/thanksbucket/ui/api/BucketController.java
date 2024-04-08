@@ -26,41 +26,41 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/buckets")
+@RequestMapping("/api")
 @Tag(name = "buckets", description = "버킷")
 @RequiredArgsConstructor
 public class BucketController {
     private final BucketService bucketService;
 
-    @PostMapping("")
+    @PostMapping("/buckets")
     public ResponseEntity<Void> create(@AuthenticationPrincipal User user, @Valid @RequestBody CreateBucketRequest request) {
         Long bucketId = bucketService.create(user.getUsername(), request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<BucketResponse>> findAll(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(bucketService.findAll(user.getUsername()));
+    @GetMapping("/{memberId}/buckets")
+    public ResponseEntity<List<BucketResponse>> findAll(@PathVariable String memberId) {
+        return ResponseEntity.ok(bucketService.findAll(memberId));
     }
 
-    @GetMapping("/{bucketId}")
+    @GetMapping("/buckets/{bucketId}")
     public ResponseEntity<BucketResponse> findOne(@AuthenticationPrincipal User user, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId) {
-        return ResponseEntity.ok(bucketService.findById(user.getUsername(), bucketId));
+        return ResponseEntity.ok(bucketService.findById(bucketId));
     }
 
-    @PutMapping("/{bucketId}")
+    @PutMapping("/buckets/{bucketId}")
     public ResponseEntity<Void> put(@AuthenticationPrincipal User user, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId, @Valid @RequestBody UpdateBucketRequest request) {
         bucketService.update(user.getUsername(), bucketId, request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
-    @PatchMapping("/{bucketId}")
+    @PatchMapping("/buckets/{bucketId}")
     public ResponseEntity<Void> patch(@AuthenticationPrincipal User user, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId, @Valid @RequestBody PatchBucketRequest request) {
         bucketService.patch(user.getUsername(), bucketId, request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
-    @DeleteMapping("/{bucketId}")
+    @DeleteMapping("/buckets/{bucketId}")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal User user, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId) {
         bucketService.delete(user.getUsername(), bucketId);
         return ResponseEntity.noContent().build();
