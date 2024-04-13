@@ -8,5 +8,5 @@ import java.util.List;
 @Repository
 public interface BucketTemplateRepository extends JpaRepository<BucketTemplate, Long> {
 
-    List<BucketTemplate> findBucketTemplateByBucketNameContaining(String bucketName);
+    List<BucketTemplate> findAllByOrderByBucketName();
 }

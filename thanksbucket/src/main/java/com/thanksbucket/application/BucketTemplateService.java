@@ -14,7 +14,7 @@ import java.util.List;
 public class BucketTemplateService {
     private final BucketTemplateRepository bucketTemplateRepository;
 
-    public List<BucketTemplate> findByBucketName(String bucketName) {
-        return bucketTemplateRepository.findBucketTemplateByBucketNameContaining(bucketName);
+    public List<BucketTemplate> find() {
+        return bucketTemplateRepository.findAllByOrderByBucketName();
     }
 }
