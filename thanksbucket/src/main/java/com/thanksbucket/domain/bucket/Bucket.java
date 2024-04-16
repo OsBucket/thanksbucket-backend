@@ -2,6 +2,7 @@ package com.thanksbucket.domain.bucket;
 
 import com.thanksbucket.domain.buckettodo.BucketTodo;
 import com.thanksbucket.domain.buckettopic.BucketTopic;
+import com.thanksbucket.domain.common.BaseTimeEntity;
 import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.topic.Topic;
 import jakarta.persistence.CascadeType;
@@ -20,7 +21,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +28,11 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "buckets")
-public class Bucket {
+public class Bucket extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 
     @Column
     private String title;
@@ -66,7 +63,6 @@ public class Bucket {
 
     public static Bucket create(String title, LocalDate goalDate, Member member) {
         Bucket bucket = new Bucket(title, goalDate, false, member);
-        bucket.createdAt = LocalDateTime.now();
         return bucket;
     }
 
