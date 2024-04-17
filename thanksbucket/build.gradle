@@ -36,8 +36,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     annotationProcessor('org.projectlombok:lombok')
 
+    // slack
+    implementation 'com.slack.api:slack-api-client:1.39.0'
+
 
     // test
+    testImplementation 'com.h2database:h2:2.2.224'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation('org.projectlombok:lombok')
     testAnnotationProcessor('org.projectlombok:lombok')

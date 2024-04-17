@@ -4,6 +4,7 @@ import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.member.MemberRepository;
 import com.thanksbucket.domain.occupation.Occupation;
 import com.thanksbucket.domain.occupation.OccupationRepository;
+import com.thanksbucket.slack.SlackService;
 import com.thanksbucket.ui.dto.SignupRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final OccupationRepository occupationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SlackService slackService;
 
     public Long signup(SignupRequest request) {
         memberRepository.findByMemberId(request.getMemberId())
@@ -25,10 +27,14 @@ public class AuthService {
             Occupation occupation = occupationRepository.findById(request.getOccupationId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다."));
             Member member = Member.signup(passwordEncoder, request.getMemberId(), request.getPassword(), request.getNickname(), request.getBirthday(), occupation);
-            return memberRepository.save(member).getId();
+            Member savedMember = memberRepository.save(member);
+            slackService.sendSignupMessage(savedMember.getNickname());
+            return savedMember.getId();
         }
         Member member = Member.signup(passwordEncoder, request.getMemberId(), request.getPassword(), request.getNickname(), request.getBirthday(), null);
-        return memberRepository.save(member).getId();
+        Member savedMember = memberRepository.save(member);
+        slackService.sendSignupMessage(savedMember.getNickname());
+        return savedMember.getId();
     }
 
     public Member findByMemberId(String memberId) {
