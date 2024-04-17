@@ -19,7 +19,7 @@ public class SlackService {
     private final Slack slack = Slack.getInstance();
 
     public void sendSignupMessage(String nickname) {
-        sendMessage(String.format("[%s] 회원가입 알림: %s 님이 신규가입했어요!", env, nickname));
+        sendMessage(String.format("[%s] 회원가입 -  %s 님이 신규가입했어요\uD83C\uDF89\uD83C\uDF89", env, nickname));
     }
 
     private void sendMessage(String text) {

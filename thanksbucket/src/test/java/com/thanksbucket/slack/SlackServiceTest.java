@@ -11,7 +11,7 @@ class SlackServiceTest {
     SlackService slackService;
 
     @Test
-    void sendMessage() {
-//        slackService.sendMessage("알림 테스트");
+    void sendSignupMessage() {
+//        slackService.sendSignupMessage("이루다");
     }
 }
