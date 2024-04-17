@@ -7,11 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class LoginDto {
+public class LoginRequest {
     private String memberId;
     private String password;
 
-    public LoginDto(String memberId, String password) {
+    public LoginRequest(String memberId, String password) {
         this.memberId = memberId;
         this.password = password;
     }

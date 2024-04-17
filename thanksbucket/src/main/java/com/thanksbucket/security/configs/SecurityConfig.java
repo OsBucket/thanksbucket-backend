@@ -1,73 +1,111 @@
 package com.thanksbucket.security.configs;
 
-import com.thanksbucket.security.filter.AjaxLoginProcessingFilter;
+import com.thanksbucket.security.authentication.LoginAuthenticationFilter;
+import com.thanksbucket.security.authentication.LoginAuthenticationProvider;
+import com.thanksbucket.security.authentication.www.CustomUnauthorizedEntryPoint;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationFailureHandler;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationFilter;
+import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationSuccessHandler;
+import com.thanksbucket.security.authentication.www.jwt.JWTTokenProvider;
+import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
+import com.thanksbucket.security.authentication.www.session.SessionAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@EnableWebSecurity
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final AuthenticationConfiguration authenticationConfiguration;
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
-    private final AuthenticationFailureHandler authenticationFailureHandler;
-    private final AccessDeniedHandler accessDeniedHandler;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final UserDetailsService userDetailsService;
+    private final JWTUtils jwtUtils;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                //TODO 권한 조정 필요
-                .authorizeHttpRequests((authorize) -> authorize
+                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/api/health").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/signup","/api/occupations","/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/occupations", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
                 )
-                .exceptionHandling((exceptionHandling) -> {
-                    exceptionHandling.accessDeniedHandler(accessDeniedHandler);
-                    exceptionHandling.authenticationEntryPoint(authenticationEntryPoint);
-                })
-                .sessionManagement((sessionManagement) -> {
-                    sessionManagement.maximumSessions(1)
-                            .maxSessionsPreventsLogin(true);
-                })
-                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(true))
+                .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable());
 
         return http.build();
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true); //내서버가 응답을 할때 json을 자바스크립트에서 처리할 수 있게 할지
+        config.addAllowedOriginPattern("*"); //모든 아이피를 응답허용
+        config.addAllowedHeader("*"); //모든 header 응답허용
+        config.addAllowedMethod("*"); //모든 post,get,put 허용
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        String encodingId = "bcrypt";
+        Map<String, PasswordEncoder> encoders = new HashMap<>();
+        encoders.put(encodingId, new BCryptPasswordEncoder());
+        return new DelegatingPasswordEncoder(encodingId, encoders);
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public JWTTokenProvider jwtTokenProvider(JWTUtils jwtUtils) {
+        return new JWTTokenProvider(jwtUtils);
     }
 
     @Bean
-    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
-        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
-        ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        ajaxLoginProcessingFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
-        ajaxLoginProcessingFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
-        return ajaxLoginProcessingFilter;
+    public LoginAuthenticationProvider loginAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
+        return new LoginAuthenticationProvider(passwordEncoder, userDetailsService);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(jwtTokenProvider(jwtUtils));
+        authenticationManagerBuilder.authenticationProvider(loginAuthenticationProvider(passwordEncoder(), userDetailsService));
+        return authenticationManagerBuilder.build();
+    }
+
+    private UsernamePasswordAuthenticationFilter loginFilter() throws Exception {
+        UsernamePasswordAuthenticationFilter loginAuthenticationFilter = new LoginAuthenticationFilter(authenticationManager(null));
+        loginAuthenticationFilter.setAuthenticationSuccessHandler(new JWTAuthenticationSuccessHandler(jwtUtils, new SessionAuthenticationSuccessHandler()));
+        loginAuthenticationFilter.setAuthenticationFailureHandler(new JWTAuthenticationFailureHandler());
+        return loginAuthenticationFilter;
+    }
+
+    private JWTAuthenticationFilter jwtFilter() throws Exception {
+        return new JWTAuthenticationFilter(authenticationManager(null));
     }
 }

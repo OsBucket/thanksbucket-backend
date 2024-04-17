@@ -42,8 +42,8 @@ public class BucketService {
 
     public List<BucketResponse> findAll(String memberId) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-        List<Bucket> buckets = bucketRepository.findBucketsByMemberOrderByCreatedAtDesc(member);
-        return buckets.stream().map(BucketResponse::new).collect(Collectors.toList());
+        List<Bucket> buckets = bucketRepository.findBucketsByMemberOrderByIdDesc(member);
+        return buckets.stream().map(BucketResponse::new).toList();
     }
 
     public BucketResponse findById(String memberId, Long bucketId) {

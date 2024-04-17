@@ -30,4 +30,8 @@ public class AuthService {
         Member member = Member.signup(passwordEncoder, request.getMemberId(), request.getPassword(), request.getNickname(), request.getBirthday(), null);
         return memberRepository.save(member).getId();
     }
+
+    public Member findByMemberId(String memberId) {
+        return memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("인증에 성공한 유저가 존재하지 않습니다."));
+    }
 }

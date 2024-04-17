@@ -1,4 +1,4 @@
-package com.thanksbucket.security.handler;
+package com.thanksbucket.security.authentication.www.session;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -11,13 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
 @Slf4j
-public class AjaxAuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class SessionAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

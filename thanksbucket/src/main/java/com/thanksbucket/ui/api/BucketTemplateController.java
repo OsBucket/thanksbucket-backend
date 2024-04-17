@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,8 +20,8 @@ public class BucketTemplateController {
     private final BucketTemplateService bucketTemplateService;
 
     @GetMapping("")
-    public ResponseEntity<List<BucketTemplateResponse>> findByBucketName(@RequestParam String bucketName) {
-        List<BucketTemplate> bucketTemplates = bucketTemplateService.findByBucketName(bucketName);
+    public ResponseEntity<List<BucketTemplateResponse>> search() {
+        List<BucketTemplate> bucketTemplates = bucketTemplateService.find();
         return ResponseEntity.ok(bucketTemplates.stream().map(BucketTemplateResponse::new).toList());
     }
 }
