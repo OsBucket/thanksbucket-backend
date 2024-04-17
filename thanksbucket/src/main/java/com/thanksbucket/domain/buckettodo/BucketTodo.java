@@ -1,6 +1,7 @@
 package com.thanksbucket.domain.buckettodo;
 
 import com.thanksbucket.domain.bucket.Bucket;
+import com.thanksbucket.domain.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,19 +14,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BucketTodo {
+public class BucketTodo extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private String content;
@@ -44,9 +40,7 @@ public class BucketTodo {
     }
 
     public static BucketTodo create(String content, boolean isDone) {
-        BucketTodo bucketTodo = new BucketTodo(content, isDone, null);
-        bucketTodo.createdAt = LocalDateTime.now();
-        return bucketTodo;
+        return new BucketTodo(content, isDone, null);
     }
 
     public void setBucket(Bucket bucket) {

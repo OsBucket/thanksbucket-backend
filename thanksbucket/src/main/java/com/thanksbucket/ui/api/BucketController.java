@@ -5,6 +5,7 @@ import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
 import com.thanksbucket.ui.dto.PatchBucketRequest;
 import com.thanksbucket.ui.dto.UpdateBucketRequest;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,24 +44,24 @@ public class BucketController {
     }
 
     @GetMapping("/{bucketId}")
-    public ResponseEntity<BucketResponse> findOne(@AuthenticationPrincipal User user, @PathVariable Long bucketId) {
+    public ResponseEntity<BucketResponse> findOne(@AuthenticationPrincipal User user, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId) {
         return ResponseEntity.ok(bucketService.findById(user.getUsername(), bucketId));
     }
 
     @PutMapping("/{bucketId}")
-    public ResponseEntity<Void> put(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody UpdateBucketRequest request) {
+    public ResponseEntity<Void> put(@AuthenticationPrincipal User user, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId, @Valid @RequestBody UpdateBucketRequest request) {
         bucketService.update(user.getUsername(), bucketId, request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
     @PatchMapping("/{bucketId}")
-    public ResponseEntity<Void> patch(@AuthenticationPrincipal User user, @PathVariable Long bucketId, @Valid @RequestBody PatchBucketRequest request) {
+    public ResponseEntity<Void> patch(@AuthenticationPrincipal User user, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId, @Valid @RequestBody PatchBucketRequest request) {
         bucketService.patch(user.getUsername(), bucketId, request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
     @DeleteMapping("/{bucketId}")
-    public ResponseEntity<Void> delete(@AuthenticationPrincipal User user, @PathVariable Long bucketId) {
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal User user, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId) {
         bucketService.delete(user.getUsername(), bucketId);
         return ResponseEntity.noContent().build();
     }

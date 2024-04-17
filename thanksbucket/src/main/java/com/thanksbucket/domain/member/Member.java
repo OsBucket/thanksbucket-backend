@@ -1,6 +1,7 @@
 package com.thanksbucket.domain.member;
 
 import com.thanksbucket.domain.bucket.Bucket;
+import com.thanksbucket.domain.common.BaseTimeEntity;
 import com.thanksbucket.domain.occupation.Occupation;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,7 +20,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,14 +27,11 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "members")
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 
     @Column(unique = true)
     private String memberId;
@@ -65,8 +62,6 @@ public class Member {
 
     public static Member signup(PasswordEncoder passwordEncoder, String memberId, String password, String nickname, LocalDate birthday, Occupation occupation) {
         password = passwordEncoder.encode(password);
-        Member member = new Member(memberId, password, nickname, birthday, occupation);
-        member.createdAt = LocalDateTime.now();
-        return member;
+        return new Member(memberId, password, nickname, birthday, occupation);
     }
 }
