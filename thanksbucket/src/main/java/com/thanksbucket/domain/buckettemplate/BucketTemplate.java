@@ -1,6 +1,7 @@
 package com.thanksbucket.domain.buckettemplate;
 
 import com.thanksbucket.domain.buckettemplatetopics.BucketTemplateTopic;
+import com.thanksbucket.domain.common.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +14,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,14 +21,11 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "bucket_template")
-public class BucketTemplate {
+public class BucketTemplate extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Long id;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private String bucketName;
