@@ -9,5 +9,6 @@ public class LoginAuthenticationProvider extends DaoAuthenticationProvider {
     public LoginAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
         super(passwordEncoder);
         super.setUserDetailsService(userDetailsService);
+        super.setHideUserNotFoundExceptions(false);
     }
 }
