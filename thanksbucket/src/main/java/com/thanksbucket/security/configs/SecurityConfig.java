@@ -9,6 +9,10 @@ import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationSuccess
 import com.thanksbucket.security.authentication.www.jwt.JWTTokenProvider;
 import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
 import com.thanksbucket.security.authentication.www.session.SessionAuthenticationSuccessHandler;
+import com.thanksbucket.security.oauth2.handler.OAuth2LoginFailureHandler;
+import com.thanksbucket.security.oauth2.handler.OAuth2LoginSuccessHandler;
+import com.thanksbucket.security.oauth2.service.CustomOAuth2UserService;
+import com.thanksbucket.security.oauth2.service.HttpCookieOAuth2AuthorizationRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,10 +20,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -35,12 +42,20 @@ import java.util.Map;
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JWTUtils jwtUtils;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .formLogin(formLogin -> formLogin.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/api/health", "/api").permitAll()
+                        .requestMatchers("/index.html").permitAll() //TODO 임시 FE AuthorizationCode 대체
                         .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/occupations", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
@@ -48,14 +63,25 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
-                .sessionManagement(sessionManagement -> sessionManagement
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true))
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .failureHandler(new OAuth2LoginFailureHandler())
+                        .successHandler(new OAuth2LoginSuccessHandler(jwtUtils))
+                        .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
+                                .authorizationRequestRepository(new HttpCookieOAuth2AuthorizationRequestRepository())
+                        )
+                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                                .userService(customOAuth2UserService)
+                        )
+                )
                 .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable());
+                .addFilterAfter(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
     @Bean
