@@ -4,13 +4,11 @@ package com.thanksbucket.ui.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 import java.time.LocalDate;
 
-@AllArgsConstructor
-@Getter
+@Data
 public class SignupRequest {
     @NotBlank
     @Size(min = 2, max = 10)

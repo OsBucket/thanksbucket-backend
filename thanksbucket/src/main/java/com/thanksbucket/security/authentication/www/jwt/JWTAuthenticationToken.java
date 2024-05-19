@@ -13,26 +13,19 @@ public class JWTAuthenticationToken extends AbstractAuthenticationToken {
     private final AuthMember principal;
     private final String credentials;
 
-    private JWTAuthenticationToken(AuthMember principal, String credentials) {
-        super(null);
-        this.principal = principal;
-        this.credentials = credentials;
-        setAuthenticated(false);
-    }
-
-    private JWTAuthenticationToken(AuthMember principal, String credentials, Collection<? extends GrantedAuthority> authorities) {
+    private JWTAuthenticationToken(AuthMember principal, String credentials, Collection<? extends GrantedAuthority> authorities, boolean authenticated) {
         super(authorities);
         this.principal = principal;
         this.credentials = credentials;
-        super.setAuthenticated(true);
+        super.setAuthenticated(authenticated);
     }
 
-    public static JWTAuthenticationToken unauthenticated(String token) {
-        return new JWTAuthenticationToken(null, token);
+    public static JWTAuthenticationToken unauthenticated(String header) {
+        return new JWTAuthenticationToken(null, header, null, false);
     }
 
-    public static JWTAuthenticationToken authenticated(AuthMember authMember, String token, Collection<? extends GrantedAuthority> authorities) {
-        return new JWTAuthenticationToken(authMember, token, authorities);
+    public static JWTAuthenticationToken authenticated(AuthMember authMember, String header, Collection<? extends GrantedAuthority> authorities) {
+        return new JWTAuthenticationToken(authMember, header, authorities, true);
     }
 
 

@@ -41,3 +41,6 @@ src/main/resources/*.properties
 
 /src/main/resources-env/production/*.properties
 /src/main/resources-env/staging/*.properties
+/src/main/resources-env/preview/*.properties
+
+/src/test/resources/*.properties

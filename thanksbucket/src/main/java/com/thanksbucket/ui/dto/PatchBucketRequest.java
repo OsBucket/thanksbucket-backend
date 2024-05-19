@@ -1,15 +1,10 @@
 package com.thanksbucket.ui.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@AllArgsConstructor
-@Getter
+@Data
 public class PatchBucketRequest {
     @NotNull
     private Boolean isDone;
-
-    public PatchBucketRequest() {
-    }
 }
