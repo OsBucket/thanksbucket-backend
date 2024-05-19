@@ -13,7 +13,7 @@ public class AuthMember extends User {
 
     public static AuthMember fromMember(Member member) {
         List<GrantedAuthority> defaultAuthorities = generateDefaultAuthorities();
-        return new AuthMember(member.getMemberId(), member.getPassword(), defaultAuthorities);
+        return new AuthMember(member.getNickname(), member.getPassword(), defaultAuthorities);
     }
 
     public AuthMember(String username, String password, Collection<? extends GrantedAuthority> authorities) {
