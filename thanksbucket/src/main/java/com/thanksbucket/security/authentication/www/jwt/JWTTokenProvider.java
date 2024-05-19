@@ -6,9 +6,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Collection;
 
 @Slf4j
 public class JWTTokenProvider implements AuthenticationProvider {
@@ -35,9 +32,8 @@ public class JWTTokenProvider implements AuthenticationProvider {
         }
         String token = split[1];
         String username = jwtUtils.getUsername(token);
-        Collection<GrantedAuthority> authorities = jwtUtils.getAuthorities(token);
-        AuthMember authMember = new AuthMember(username, token, authorities);
-        return JWTAuthenticationToken.authenticated(authMember, token, authorities);
+        AuthMember authMember = new AuthMember(username, token);
+        return JWTAuthenticationToken.authenticated(authMember, token);
     }
 
     @Override
