@@ -10,21 +10,34 @@ import java.util.List;
 
 public class AuthMember extends User {
     public static final String DEFAULT_ROLE = "ROLE_USER";
+    private final String nickname;
+
+    private AuthMember(String email, String nickname, String password) {
+        this(email, nickname, password, generateDefaultAuthorities());
+    }
+
+    private AuthMember(String email, String nickname, String password, Collection<? extends GrantedAuthority> authorities) {
+        super(email, password, authorities);
+        this.nickname = nickname;
+    }
 
     public static AuthMember fromMember(Member member) {
-        List<GrantedAuthority> defaultAuthorities = generateDefaultAuthorities();
-        return new AuthMember(member.getNickname(), member.getPassword(), defaultAuthorities);
+        return new AuthMember(member.getEmail(), member.getNickname(), member.getPassword());
     }
 
-    public AuthMember(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
-    }
-
-    public AuthMember(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+    public static AuthMember fromToken(String email, String nickname, String token) {
+        return new AuthMember(email, nickname, token);
     }
 
     private static List<GrantedAuthority> generateDefaultAuthorities() {
         return List.of(new SimpleGrantedAuthority(DEFAULT_ROLE));
+    }
+
+    public String getEmail() {
+        return getUsername();
+    }
+
+    public String getNickname() {
+        return nickname;
     }
 }
