@@ -42,6 +42,9 @@ public class Member extends BaseTimeEntity {
     private String password;
 
     @Column
+    private String email;
+
+    @Column
     private String nickname;
 
     @Column
@@ -55,6 +58,9 @@ public class Member extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
+
+    @Column
+    private String refreshToken;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Bucket> buckets = new ArrayList<>();
@@ -71,8 +77,18 @@ public class Member extends BaseTimeEntity {
         this.occupation = occupation;
     }
 
+    //TODO 삭제 예정
+    public Member(String email, String nickname) {
+        this.email = email;
+        this.nickname = nickname;
+    }
+
     public static Member signup(PasswordEncoder passwordEncoder, String memberId, String password, String nickname, LocalDate birthday, Occupation occupation) {
         password = passwordEncoder.encode(password);
         return new Member(memberId, password, nickname, birthday, occupation);
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
