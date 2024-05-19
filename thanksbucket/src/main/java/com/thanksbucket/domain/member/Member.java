@@ -6,6 +6,8 @@ import com.thanksbucket.domain.occupation.Occupation;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,7 +45,16 @@ public class Member extends BaseTimeEntity {
     private String nickname;
 
     @Column
+    private String imageUrl;
+
+    @Column
     private LocalDate birthday;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Bucket> buckets = new ArrayList<>();
