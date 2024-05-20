@@ -4,6 +4,7 @@ import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.member.MemberRepository;
 import com.thanksbucket.domain.occupation.Occupation;
 import com.thanksbucket.domain.occupation.OccupationRepository;
+import com.thanksbucket.security.oauth2.userinfo.OAuth2UserInfo;
 import com.thanksbucket.slack.SlackService;
 import com.thanksbucket.ui.dto.SignupRequest;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,11 @@ public class AuthService {
         Member savedMember = memberRepository.save(member);
         slackService.sendSignupMessage(savedMember.getNickname());
         return savedMember.getId();
+    }
+
+    public Member findIfNotExistCreateMember(OAuth2UserInfo oAuth2UserInfo) {
+        return memberRepository.findBySocialTypeAndSocialId(oAuth2UserInfo.getSocialType(), oAuth2UserInfo.getSocialId())
+                .orElseGet(() -> memberRepository.save(oAuth2UserInfo.toEntity()));
     }
 
     public Member findByMemberId(String memberId) {
