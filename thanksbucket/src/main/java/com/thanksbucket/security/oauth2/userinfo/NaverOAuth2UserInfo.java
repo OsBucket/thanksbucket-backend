@@ -1,5 +1,6 @@
 package com.thanksbucket.security.oauth2.userinfo;
 
+import com.thanksbucket.domain.member.SocialType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -7,13 +8,19 @@ import java.util.Map;
 public class NaverOAuth2UserInfo extends OAuth2UserInfo {
 
     public NaverOAuth2UserInfo(Map<String, Object> attributes) {
-        super(attributes);
+        super(SocialType.NAVER, attributes);
     }
 
     @Override
-    public String getId() {
+    public String getSocialId() {
         Map<String, Object> response = getResponse();
         return String.valueOf(response.get("id"));
+    }
+
+    @Override
+    public String getEmail() {
+        Map<String, Object> response = getResponse();
+        return (String) response.get("email");
     }
 
     @Override

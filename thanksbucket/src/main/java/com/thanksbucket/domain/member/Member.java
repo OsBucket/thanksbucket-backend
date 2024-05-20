@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,10 +55,13 @@ public class Member extends BaseTimeEntity {
     private LocalDate birthday;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private MemberRole memberRole;
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
+
+    @Column
+    private String socialId;
 
     @Column
     private String refreshToken;
@@ -68,6 +72,35 @@ public class Member extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occupation_id")
     private Occupation occupation;
+
+    @Builder
+    private Member(Long id, String memberId, String password, String email, String nickname, String imageUrl, LocalDate birthday, MemberRole memberRole, SocialType socialType, String socialId, String refreshToken, List<Bucket> buckets, Occupation occupation) {
+        this.id = id;
+        this.memberId = memberId;
+        this.password = password;
+        this.email = email;
+        this.nickname = nickname;
+        this.imageUrl = imageUrl;
+        this.birthday = birthday;
+        this.memberRole = memberRole;
+        this.socialType = socialType;
+        this.socialId = socialId;
+        this.refreshToken = refreshToken;
+        this.buckets = buckets;
+        this.occupation = occupation;
+    }
+
+
+    public static Member firstLoginOAuth(String email, SocialType socialType, String socialId, String imageUrl) {
+        return Member.builder()
+                .email(email)
+                .socialType(socialType)
+                .socialId(socialId)
+                .imageUrl(imageUrl)
+                .memberRole(MemberRole.GUEST)
+                .build();
+    }
+
 
     public Member(String memberId, String password, String nickname, LocalDate birthday, Occupation occupation) {
         this.memberId = memberId;
