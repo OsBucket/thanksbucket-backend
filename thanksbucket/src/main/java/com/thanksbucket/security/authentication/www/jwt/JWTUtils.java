@@ -28,21 +28,18 @@ public class JWTUtils {
     private final long REFRESH_EXPIRE_MINUTE;
 
     private final SecretKey key;
-//    private final AuthService authService;
 
     public JWTUtils(@Value("${jwt.secret-key}") String secretKey,
                     @Value("${jwt.access-token.expire-minutes}") long accessExpireMinutes,
                     @Value("${jwt.refresh-token.expire-minutes}") long refreshExpireMinutes
-//                    AuthService authService
     ) {
         this.SECRET_KEY = secretKey;
         this.ACCESS_EXPIRE_MINUTE = accessExpireMinutes;
         this.REFRESH_EXPIRE_MINUTE = refreshExpireMinutes;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
-//        this.authService = authService;
     }
 
-    public String generateToken(String email, String nickname, Collection<GrantedAuthority> authorities) {
+    public String generateToken(String email, String nickname, Collection<? extends GrantedAuthority> authorities) {
         return Jwts.builder()
                 .issuer("ThanksBucket")
                 .subject(email)
