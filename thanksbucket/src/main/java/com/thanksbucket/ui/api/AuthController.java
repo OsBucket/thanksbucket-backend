@@ -1,7 +1,6 @@
 package com.thanksbucket.ui.api;
 
 import com.thanksbucket.application.AuthService;
-import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import com.thanksbucket.ui.dto.ProfileResponse;
 import com.thanksbucket.ui.dto.SignupRequest;
@@ -44,7 +43,6 @@ public class AuthController {
 
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponse> profile(@AuthenticationPrincipal AuthMember authMember) {
-        Member member = authService.findByMemberId(authMember.getUsername());
-        return ResponseEntity.ok(new ProfileResponse(member.getId(), member.getNickname()));
+        return ResponseEntity.ok(ProfileResponse.fromAuthMember(authMember));
     }
 }

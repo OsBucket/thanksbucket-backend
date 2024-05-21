@@ -25,11 +25,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JWTUtils jwtUtils;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,8 +43,9 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/api/health", "/api").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/index.html").permitAll() //TODO 임시 FE AuthorizationCode 대체
-                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/occupations", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/signup", "/api/occupations", "/api/auth/profile").hasRole("GUEST")
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
@@ -51,7 +53,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
                 .oauth2Login(oauth2Login -> oauth2Login
-                        .successHandler(new OAuth2LoginSuccessHandler(jwtUtils))
+                        .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(new OAuth2LoginFailureHandler())
                         .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
                                 .authorizationRequestRepository(new HttpCookieOAuth2AuthorizationRequestRepository())

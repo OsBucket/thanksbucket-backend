@@ -42,7 +42,7 @@ public class CustomOAuth2User extends DefaultOAuth2User {
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .imageUrl(member.getImageUrl())
-                .authorities(List.of(member.getMemberRole().toSimpleGrantedAuthority()))
+                .authorities(List.of(member.getMemberRole()))
                 .build();
     }
 

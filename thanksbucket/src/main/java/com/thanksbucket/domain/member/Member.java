@@ -20,7 +20,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class Member extends BaseTimeEntity {
                 .socialType(socialType)
                 .socialId(socialId)
                 .imageUrl(imageUrl)
-                .memberRole(MemberRole.GUEST)
+                .memberRole(MemberRole.ROLE_GUEST)
                 .build();
     }
 
@@ -114,7 +113,7 @@ public class Member extends BaseTimeEntity {
         this.nickname = nickname;
         this.birthday = birthday;
         this.discoveryPath = discoveryPath;
-        this.memberRole = MemberRole.USER;
+        this.memberRole = MemberRole.ROLE_USER;
     }
 
     public void updateOccupation(Occupation occupation) {
