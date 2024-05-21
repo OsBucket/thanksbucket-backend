@@ -64,8 +64,8 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new CustomUnauthorizedEntryPoint()))
                 .oauth2Login(oauth2Login -> oauth2Login
-                        .failureHandler(new OAuth2LoginFailureHandler())
                         .successHandler(new OAuth2LoginSuccessHandler(jwtUtils))
+                        .failureHandler(new OAuth2LoginFailureHandler())
                         .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
                                 .authorizationRequestRepository(new HttpCookieOAuth2AuthorizationRequestRepository())
                         )
