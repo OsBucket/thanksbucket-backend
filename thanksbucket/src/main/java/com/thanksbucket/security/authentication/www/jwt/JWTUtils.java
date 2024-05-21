@@ -92,7 +92,7 @@ public class JWTUtils {
         return claims.get(CLAIM_NICKNAME_KEY, String.class);
     }
 
-    public Collection<? extends GrantedAuthority> getAuthorities(String token) {
+    public List<MemberRole> getAuthorities(String token) {
         Claims claims = decodeToken(token);
         ArrayList<String> roles = claims.get(CLAIM_AUTHORITIES_KEY, ArrayList.class);
         return roles.stream().map(MemberRole::of).toList();
