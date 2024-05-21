@@ -19,7 +19,7 @@ public class AuthService {
     private final OccupationRepository occupationRepository;
     private final SlackService slackService;
 
-    @Transactional()
+    @Transactional
     public Long signup(SignupRequest request, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("인증에 성공한 유저가 존재하지 않습니다."));
         member.validateBeforeSignedUp();
@@ -33,6 +33,7 @@ public class AuthService {
         return member.getId();
     }
 
+    @Transactional
     public Member findIfNotExistCreateMember(OAuth2UserInfo oAuth2UserInfo) {
         return memberRepository.findBySocialTypeAndSocialId(oAuth2UserInfo.getSocialType(), oAuth2UserInfo.getSocialId())
                 .orElseGet(() -> memberRepository.save(oAuth2UserInfo.toEntity()));
