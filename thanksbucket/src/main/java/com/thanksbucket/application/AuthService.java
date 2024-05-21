@@ -9,14 +9,17 @@ import com.thanksbucket.slack.SlackService;
 import com.thanksbucket.ui.dto.SignupRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
     private final MemberRepository memberRepository;
     private final OccupationRepository occupationRepository;
     private final SlackService slackService;
 
+    @Transactional()
     public Long signup(SignupRequest request, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("인증에 성공한 유저가 존재하지 않습니다."));
         if (request.getOccupationId() != null) {
@@ -32,9 +35,5 @@ public class AuthService {
     public Member findIfNotExistCreateMember(OAuth2UserInfo oAuth2UserInfo) {
         return memberRepository.findBySocialTypeAndSocialId(oAuth2UserInfo.getSocialType(), oAuth2UserInfo.getSocialId())
                 .orElseGet(() -> memberRepository.save(oAuth2UserInfo.toEntity()));
-    }
-
-    public Member findByMemberId(String memberId) {
-        return memberRepository.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("인증에 성공한 유저가 존재하지 않습니다."));
     }
 }

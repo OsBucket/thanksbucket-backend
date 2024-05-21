@@ -1,5 +1,6 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
+import com.thanksbucket.domain.member.MemberRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
@@ -39,7 +41,7 @@ public class JWTUtils {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
-    public String generateToken(String email, String nickname, Collection<? extends GrantedAuthority> authorities) {
+    public String generateToken(String email, String nickname, Collection<? extends GrantedAuthority> memberRoles) {
         return Jwts.builder()
                 .issuer("ThanksBucket")
                 .subject(email)
@@ -47,7 +49,7 @@ public class JWTUtils {
                 .issuedAt(new Date())
                 .claims()
                 .add(CLAIM_NICKNAME_KEY, nickname)
-                .add(CLAIM_AUTHORITIES_KEY, authorities)
+                .add(CLAIM_AUTHORITIES_KEY, memberRoles.stream().map(GrantedAuthority::getAuthority).toList())
                 .and()
                 .signWith(key)
                 .compact();
@@ -77,6 +79,12 @@ public class JWTUtils {
     public String getNickname(String token) {
         Claims claims = decodeToken(token);
         return claims.get(CLAIM_NICKNAME_KEY, String.class);
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities(String token) {
+        Claims claims = decodeToken(token);
+        ArrayList<String> roles = claims.get(CLAIM_AUTHORITIES_KEY, ArrayList.class);
+        return roles.stream().map(MemberRole::of).toList();
     }
 
     public LocalDateTime getExpireDate() {
