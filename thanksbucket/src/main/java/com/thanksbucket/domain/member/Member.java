@@ -116,6 +116,12 @@ public class Member extends BaseTimeEntity {
         this.memberRole = MemberRole.ROLE_USER;
     }
 
+    public void validateBeforeSignedUp() {
+        if (this.memberRole == MemberRole.ROLE_USER) {
+            throw new IllegalStateException("이미 가입된 회원입니다.");
+        }
+    }
+
     public void updateOccupation(Occupation occupation) {
         this.occupation = occupation;
     }

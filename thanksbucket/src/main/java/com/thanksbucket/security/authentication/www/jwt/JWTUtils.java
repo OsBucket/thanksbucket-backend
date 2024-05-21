@@ -1,6 +1,8 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
+import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.member.MemberRole;
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -39,6 +42,14 @@ public class JWTUtils {
         this.ACCESS_EXPIRE_MINUTE = accessExpireMinutes;
         this.REFRESH_EXPIRE_MINUTE = refreshExpireMinutes;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+    }
+
+    public String generateToken(Member member) {
+        return generateToken(member.getEmail(), member.getNickname(), List.of(member.getMemberRole()));
+    }
+
+    public String generateToken(AuthMember authMember) {
+        return generateToken(authMember.getEmail(), authMember.getNickname(), authMember.getAuthorities());
     }
 
     public String generateToken(String email, String nickname, Collection<? extends GrantedAuthority> memberRoles) {
