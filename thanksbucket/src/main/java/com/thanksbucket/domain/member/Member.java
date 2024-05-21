@@ -42,10 +42,10 @@ public class Member extends BaseTimeEntity {
     @Column
     private String password;
 
-    @Column
+    @Column(unique = true)
     private String email;
 
-    @Column
+    @Column(unique = true)
     private String nickname;
 
     @Column
@@ -64,6 +64,9 @@ public class Member extends BaseTimeEntity {
     private String socialId;
 
     @Column
+    private String discoveryPath;
+
+    @Column
     private String refreshToken;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -74,7 +77,7 @@ public class Member extends BaseTimeEntity {
     private Occupation occupation;
 
     @Builder
-    private Member(Long id, String memberId, String password, String email, String nickname, String imageUrl, LocalDate birthday, MemberRole memberRole, SocialType socialType, String socialId, String refreshToken, List<Bucket> buckets, Occupation occupation) {
+    public Member(Long id, String memberId, String password, String email, String nickname, String imageUrl, LocalDate birthday, MemberRole memberRole, SocialType socialType, String socialId, String discoveryPath, String refreshToken, List<Bucket> buckets, Occupation occupation) {
         this.id = id;
         this.memberId = memberId;
         this.password = password;
@@ -85,11 +88,11 @@ public class Member extends BaseTimeEntity {
         this.memberRole = memberRole;
         this.socialType = socialType;
         this.socialId = socialId;
+        this.discoveryPath = discoveryPath;
         this.refreshToken = refreshToken;
         this.buckets = buckets;
         this.occupation = occupation;
     }
-
 
     public static Member firstLoginOAuth(String email, SocialType socialType, String socialId, String imageUrl) {
         return Member.builder()
@@ -101,24 +104,21 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
-
-    public Member(String memberId, String password, String nickname, LocalDate birthday, Occupation occupation) {
-        this.memberId = memberId;
-        this.password = password;
-        this.nickname = nickname;
-        this.birthday = birthday;
-        this.occupation = occupation;
-    }
-
     //TODO 삭제 예정
     public Member(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
     }
 
-    public static Member signup(PasswordEncoder passwordEncoder, String memberId, String password, String nickname, LocalDate birthday, Occupation occupation) {
-        password = passwordEncoder.encode(password);
-        return new Member(memberId, password, nickname, birthday, occupation);
+    public void signup(String nickname, LocalDate birthday, String discoveryPath) {
+        this.nickname = nickname;
+        this.birthday = birthday;
+        this.discoveryPath = discoveryPath;
+        this.memberRole = MemberRole.USER;
+    }
+
+    public void updateOccupation(Occupation occupation) {
+        this.occupation = occupation;
     }
 
     public void updateRefreshToken(String refreshToken) {

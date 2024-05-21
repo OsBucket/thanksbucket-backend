@@ -13,14 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class SignupRequest {
     @NotBlank
-    @Size(min = 2, max = 10)
-    private String memberId;
-
-    @NotBlank
-    @Size(min = 8, max = 16)
-    private String password;
-
-    @NotBlank
     @Size(min = 2, max = 8)
     private String nickname;
 
@@ -28,4 +20,7 @@ public class SignupRequest {
     private LocalDate birthday;
 
     private Long occupationId;
+
+    @Size(max = 255)
+    private String discoveryPath;
 }

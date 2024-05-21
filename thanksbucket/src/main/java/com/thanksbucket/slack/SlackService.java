@@ -18,8 +18,8 @@ public class SlackService {
     private String SLACK_WEBHOOK_URL;
     private final Slack slack = Slack.getInstance();
 
-    public void sendSignupMessage(String nickname) {
-        sendMessage(String.format("[%s] 회원가입 -  %s 님이 신규가입했어요\uD83C\uDF89\uD83C\uDF89", env, nickname));
+    public void sendSignupMessage(String email, String nickname) {
+        sendMessage(String.format("[%s] 회원가입 - email: %s / nickname: %s 님이 신규가입했어요\uD83C\uDF89\uD83C\uDF89", env, email, nickname));
     }
 
     private void sendMessage(String text) {
