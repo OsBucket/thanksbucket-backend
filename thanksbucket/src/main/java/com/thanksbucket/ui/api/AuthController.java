@@ -28,8 +28,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request) {
-        authService.signup(request);
+    public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request, @AuthenticationPrincipal User user) {
+        authService.signup(request, user.getUsername());
         return ResponseEntity.ok().build();
     }
 
