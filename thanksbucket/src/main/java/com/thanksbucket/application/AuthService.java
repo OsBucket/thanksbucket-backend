@@ -22,6 +22,7 @@ public class AuthService {
     @Transactional()
     public Long signup(SignupRequest request, String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("인증에 성공한 유저가 존재하지 않습니다."));
+        member.validateBeforeSignedUp();
         if (request.getOccupationId() != null) {
             Occupation occupation = occupationRepository.findById(request.getOccupationId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 직업입니다."));
@@ -35,5 +36,10 @@ public class AuthService {
     public Member findIfNotExistCreateMember(OAuth2UserInfo oAuth2UserInfo) {
         return memberRepository.findBySocialTypeAndSocialId(oAuth2UserInfo.getSocialType(), oAuth2UserInfo.getSocialId())
                 .orElseGet(() -> memberRepository.save(oAuth2UserInfo.toEntity()));
+    }
+
+    public Member findByMemberId(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     }
 }

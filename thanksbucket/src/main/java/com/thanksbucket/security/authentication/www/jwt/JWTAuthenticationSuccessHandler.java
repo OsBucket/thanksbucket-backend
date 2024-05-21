@@ -39,7 +39,7 @@ public class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHan
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        String jwtToken = jwtUtils.generateToken(authMember.getEmail(), authMember.getNickname(), authMember.getAuthorities());
+        String jwtToken = jwtUtils.generateToken(authMember);
 
         //TODO Session 하위호환성
         addSuccessHandler.onAuthenticationSuccess(request, response, authentication);

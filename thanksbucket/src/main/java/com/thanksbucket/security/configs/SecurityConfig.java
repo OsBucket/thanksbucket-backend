@@ -45,7 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/api/health", "/api").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/index.html").permitAll() //TODO 임시 FE AuthorizationCode 대체
-                        .requestMatchers("/api/auth/signup", "/api/occupations", "/api/auth/profile").hasRole("GUEST")
+                        .requestMatchers("/api/auth/signup", "/api/occupations", "/api/auth/profile").hasAnyRole("GUEST", "USER")
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
