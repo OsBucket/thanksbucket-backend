@@ -28,7 +28,7 @@ public class CookieUtils {
 
     public static ResponseCookie createCookie(String cookieName, String value, String domain, String path, int maxAge, boolean httpOnly, boolean secure, String sameSite) {
         return ResponseCookie.from(cookieName, URLEncoder.encode(value, UTF_8))
-                .domain(domain)
+//                .domain(domain)
                 .path(path)
                 .maxAge(maxAge)
                 .httpOnly(httpOnly)

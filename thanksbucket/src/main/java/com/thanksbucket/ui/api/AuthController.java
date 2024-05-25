@@ -30,13 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
     private final JWTUtils jwtUtils;
-    private final String JWT_COOKIE_DOMAIN;
     private final Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
 
-    public AuthController(AuthService authService, JWTUtils jwtUtils, @Value("${jwt.cookie.domain}") String JWT_COOKIE_DOMAIN, @Value("${jwt.access-token.cookie.max-age}") Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE) {
+    public AuthController(AuthService authService, JWTUtils jwtUtils, @Value("${jwt.access-token.cookie.max-age}") Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE) {
         this.authService = authService;
         this.jwtUtils = jwtUtils;
-        this.JWT_COOKIE_DOMAIN = JWT_COOKIE_DOMAIN;
         this.JWT_ACCESS_TOKEN_COOKIE_MAX_AGE = JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
     }
 
