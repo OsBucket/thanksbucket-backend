@@ -41,7 +41,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         log.info("JWT 토큰 생성: {}", jwtToken);
         CookieUtils.saveAccessTokenCookie(response, jwtToken, JWT_COOKIE_DOMAIN, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
         clearAuthenticationAttributes(request);
-        getRedirectStrategy().sendRedirect(request, response, DEFAULT_REDIRECT_URL);
-        log.info("OAuth2 로그인 성공 후 리다이렉트 완료");
+        // 요청 Header 부터 리다이렉트 URL을 가져옴
+        String redirectURI = request.getHeader("OAUTH2_REDIRECT_URI");
+        if (redirectURI == null) {
+            redirectURI = DEFAULT_REDIRECT_URL;
+        }
+        getRedirectStrategy().sendRedirect(request, response, redirectURI);
+        log.info("OAuth2 로그인 성공 후 리다이렉트 : {}", redirectURI);
     }
 }
