@@ -40,10 +40,13 @@ public class AuthController {
         this.JWT_ACCESS_TOKEN_COOKIE_MAX_AGE = JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
     }
 
+    // TODO 변경 필요
+    //    @PostMapping("/signup")
+//    public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request, @AuthenticationPrincipal AuthMember authMember) {
     @PostMapping("/signup")
-    public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request, @AuthenticationPrincipal AuthMember authMember) {
-        Long memberId = authService.signup(request, authMember.getEmail());
-        Member member = authService.findByMemberId(memberId);
+    public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request) {
+//        Long memberId = authService.signup(request, authMember.getEmail());
+        Member member = authService.findByMemberId(2L);
         String jwtToken = jwtUtils.generateToken(member);
         log.debug("회원가입 후 jwtToken: {}", jwtToken);
         ResponseCookie cookie = CookieUtils.createAccessTokenCookie(jwtToken, JWT_COOKIE_DOMAIN, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
