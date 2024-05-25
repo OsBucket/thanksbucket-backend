@@ -19,16 +19,13 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JWTUtils jwtUtils;
     private final String DEFAULT_REDIRECT_URL; // TODO 추후에 SimpleAuthenticationSuccessHandler 사용하기
-    private final String JWT_COOKIE_DOMAIN;
     private final Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
 
     public OAuth2LoginSuccessHandler(JWTUtils jwtUtils,
                                      @Value("${app.frontend.url}") String DEFAULT_REDIRECT_URL,
-                                     @Value("${jwt.cookie.domain}") String JWT_COOKIE_DOMAIN,
                                      @Value("${jwt.access-token.cookie.max-age}") Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE) {
         this.jwtUtils = jwtUtils;
         this.DEFAULT_REDIRECT_URL = DEFAULT_REDIRECT_URL;
-        this.JWT_COOKIE_DOMAIN = JWT_COOKIE_DOMAIN;
         this.JWT_ACCESS_TOKEN_COOKIE_MAX_AGE = JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
     }
 
@@ -39,7 +36,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         String jwtToken = jwtUtils.generateToken(customOAuth2User.getEmail(), customOAuth2User.getNickname(), customOAuth2User.getAuthorities());
         log.info("JWT 토큰 생성: {}", jwtToken);
-        CookieUtils.saveAccessTokenCookie(response, jwtToken, JWT_COOKIE_DOMAIN, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
+        CookieUtils.saveAccessTokenCookie(response, jwtToken, null, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
         clearAuthenticationAttributes(request);
         // 요청 Header 부터 리다이렉트 URL을 가져옴
         String redirectURI = request.getHeader("OAUTH2_REDIRECT_URI");
