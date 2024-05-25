@@ -23,7 +23,7 @@ public class CookieUtils {
     }
 
     public static ResponseCookie createAccessTokenCookie(String jwtToken, String domain, int maxAge) {
-        return createCookie(HttpHeaders.AUTHORIZATION, generateJwtTokenFormat(jwtToken), domain, "/", maxAge, true, true, "none");
+        return createCookie(HttpHeaders.AUTHORIZATION, generateJwtTokenFormat(jwtToken), domain, "/", maxAge, true, true, "None");
     }
 
     public static ResponseCookie createCookie(String cookieName, String value, String domain, String path, int maxAge, boolean httpOnly, boolean secure, String sameSite) {
