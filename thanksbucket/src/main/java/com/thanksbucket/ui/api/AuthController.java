@@ -1,6 +1,7 @@
 package com.thanksbucket.ui.api;
 
 import com.thanksbucket.application.AuthService;
+import com.thanksbucket.common.utils.CookieUtils;
 import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
@@ -9,8 +10,8 @@ import com.thanksbucket.ui.dto.SignupRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -22,18 +23,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URLEncoder;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "auth", description = "인증")
-@RequiredArgsConstructor
 @Slf4j
 public class AuthController {
     private final AuthService authService;
     private final JWTUtils jwtUtils;
+    private final String JWT_COOKIE_DOMAIN;
+    private final Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
+
+    public AuthController(AuthService authService, JWTUtils jwtUtils, @Value("${jwt.cookie.domain}") String JWT_COOKIE_DOMAIN, @Value("${jwt.access-token.cookie.max-age}") Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE) {
+        this.authService = authService;
+        this.jwtUtils = jwtUtils;
+        this.JWT_COOKIE_DOMAIN = JWT_COOKIE_DOMAIN;
+        this.JWT_ACCESS_TOKEN_COOKIE_MAX_AGE = JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request, @AuthenticationPrincipal AuthMember authMember) {
@@ -41,11 +46,7 @@ public class AuthController {
         Member member = authService.findByMemberId(memberId);
         String jwtToken = jwtUtils.generateToken(member);
         log.debug("회원가입 후 jwtToken: {}", jwtToken);
-        ResponseCookie cookie = ResponseCookie.from("Authorization", URLEncoder.encode(String.format("Bearer %s", jwtToken), UTF_8))
-                .path("/")
-                .httpOnly(true)
-                .maxAge(60 * 60 * 24 * 7)
-                .build();
+        ResponseCookie cookie = CookieUtils.createAccessTokenCookie(jwtToken, JWT_COOKIE_DOMAIN, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();

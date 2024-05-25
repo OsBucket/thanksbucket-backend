@@ -1,4 +1,4 @@
-package com.thanksbucket.security.configs;
+package com.thanksbucket.security.config;
 
 import com.thanksbucket.security.authentication.www.CustomUnauthorizedEntryPoint;
 import com.thanksbucket.security.authentication.www.jwt.JWTAuthenticationFilter;
@@ -9,6 +9,7 @@ import com.thanksbucket.security.oauth2.handler.OAuth2LoginSuccessHandler;
 import com.thanksbucket.security.oauth2.service.CustomOAuth2UserService;
 import com.thanksbucket.security.oauth2.service.HttpCookieOAuth2AuthorizationRequestRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,16 +22,24 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JWTUtils jwtUtils;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    @Value("${cors.allowed-origins}")
+    private List<String> CORS_ALLOWED_ORIGIN;
+    @Value("${cors.allowed-methods}")
+    private List<String> CORS_ALLOWED_METHODS;
+    @Value("${cors.allowed-headers}")
+    private List<String> CORS_ALLOWED_HEADERS;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -45,7 +54,9 @@ public class SecurityConfig {
                         .requestMatchers("/", "/api/health", "/api").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/index.html").permitAll() //TODO 임시 FE AuthorizationCode 대체
-                        .requestMatchers("/api/auth/signup", "/api/occupations", "/api/auth/profile").hasAnyRole("GUEST", "USER")
+                        .requestMatchers("/api/auth/signup", "/api/occupations", "/api/auth/profile")
+                        .permitAll()
+                        //.hasAnyRole("GUEST", "USER")
                         .requestMatchers("/api/**").hasRole("USER")
                         .anyRequest()
                         .authenticated()
@@ -65,26 +76,24 @@ public class SecurityConfig {
 //                .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
 
+        http.cors((httpSecurityCorsConfigurer -> {
+            CorsConfiguration corsConfiguration = new CorsConfiguration();
+            corsConfiguration.setAllowCredentials(true);
+            corsConfiguration.setAllowedOrigins(CORS_ALLOWED_ORIGIN);
+            corsConfiguration.setAllowedMethods(CORS_ALLOWED_METHODS);
+            corsConfiguration.setAllowedHeaders(CORS_ALLOWED_HEADERS);
+
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            source.registerCorsConfiguration("/**", corsConfiguration);
+            httpSecurityCorsConfigurer.configurationSource(source);
+        }));
+
         return http.build();
     }
 
     @Bean
     public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true); //내서버가 응답을 할때 json을 자바스크립트에서 처리할 수 있게 할지
-        config.addAllowedOriginPattern("*"); //모든 아이피를 응답허용
-        config.addAllowedHeader("*"); //모든 header 응답허용
-        config.addAllowedMethod("*"); //모든 post,get,put 허용
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return source;
     }
 
     @Bean

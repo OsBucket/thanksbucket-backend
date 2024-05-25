@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -19,11 +18,18 @@ import java.io.IOException;
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JWTUtils jwtUtils;
-    private final String DEFAULT_REDIRECT_URL;
+    private final String DEFAULT_REDIRECT_URL; // TODO 추후에 SimpleAuthenticationSuccessHandler 사용하기
+    private final String JWT_COOKIE_DOMAIN;
+    private final Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
 
-    public OAuth2LoginSuccessHandler(JWTUtils jwtUtils, @Value("${app.frontend.url}") String defaultRedirectUrl) {
+    public OAuth2LoginSuccessHandler(JWTUtils jwtUtils,
+                                     @Value("${app.frontend.url}") String DEFAULT_REDIRECT_URL,
+                                     @Value("${jwt.cookie.domain}") String JWT_COOKIE_DOMAIN,
+                                     @Value("${jwt.access-token.cookie.max-age}") Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE) {
         this.jwtUtils = jwtUtils;
-        this.DEFAULT_REDIRECT_URL = defaultRedirectUrl;
+        this.DEFAULT_REDIRECT_URL = DEFAULT_REDIRECT_URL;
+        this.JWT_COOKIE_DOMAIN = JWT_COOKIE_DOMAIN;
+        this.JWT_ACCESS_TOKEN_COOKIE_MAX_AGE = JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
     }
 
     @Override
@@ -33,9 +39,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         String jwtToken = jwtUtils.generateToken(customOAuth2User.getEmail(), customOAuth2User.getNickname(), customOAuth2User.getAuthorities());
         log.info("JWT 토큰 생성: {}", jwtToken);
-        String cookieValue = String.format("Bearer %s", jwtToken);
-        log.info("Authorization 쿠키 생성: {}", cookieValue);
-        CookieUtils.saveCookie(response, HttpHeaders.AUTHORIZATION, String.format("Bearer %s", jwtToken), 60 * 60 * 24 * 7);
+        CookieUtils.saveAccessTokenCookie(response, jwtToken, JWT_COOKIE_DOMAIN, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
         clearAuthenticationAttributes(request);
         getRedirectStrategy().sendRedirect(request, response, DEFAULT_REDIRECT_URL);
         log.info("OAuth2 로그인 성공 후 리다이렉트 완료");
