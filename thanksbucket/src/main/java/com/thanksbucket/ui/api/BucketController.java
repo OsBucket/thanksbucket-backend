@@ -34,35 +34,35 @@ public class BucketController {
 
     @PostMapping("")
     public ResponseEntity<Void> create(@AuthenticationPrincipal AuthMember authMember, @Valid @RequestBody CreateBucketRequest request) {
-        Long bucketId = bucketService.create(authMember.getNickname(), request);
+        Long bucketId = bucketService.create(authMember.getMemberId(), request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
     @GetMapping("")
     public ResponseEntity<List<BucketResponse>> findAll(@AuthenticationPrincipal AuthMember authMember) {
-        return ResponseEntity.ok(bucketService.findAll(authMember.getNickname()));
+        return ResponseEntity.ok(bucketService.findAll(authMember.getMemberId()));
     }
 
     @GetMapping("/{bucketId}")
     public ResponseEntity<BucketResponse> findOne(@AuthenticationPrincipal AuthMember authMember, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId) {
-        return ResponseEntity.ok(bucketService.findById(authMember.getNickname(), bucketId));
+        return ResponseEntity.ok(bucketService.findById(authMember.getMemberId(), bucketId));
     }
 
     @PutMapping("/{bucketId}")
     public ResponseEntity<Void> put(@AuthenticationPrincipal AuthMember authMember, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId, @Valid @RequestBody UpdateBucketRequest request) {
-        bucketService.update(authMember.getNickname(), bucketId, request);
+        bucketService.update(authMember.getMemberId(), bucketId, request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
     @PatchMapping("/{bucketId}")
     public ResponseEntity<Void> patch(@AuthenticationPrincipal AuthMember authMember, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId, @Valid @RequestBody PatchBucketRequest request) {
-        bucketService.patch(authMember.getNickname(), bucketId, request);
+        bucketService.patch(authMember.getMemberId(), bucketId, request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
     }
 
     @DeleteMapping("/{bucketId}")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal AuthMember authMember, @Parameter(name = "bucketId") @PathVariable(name = "bucketId") Long bucketId) {
-        bucketService.delete(authMember.getNickname(), bucketId);
+        bucketService.delete(authMember.getMemberId(), bucketId);
         return ResponseEntity.noContent().build();
     }
 }
