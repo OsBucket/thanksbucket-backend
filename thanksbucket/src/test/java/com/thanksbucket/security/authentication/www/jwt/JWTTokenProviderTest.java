@@ -30,7 +30,7 @@ class JWTTokenProviderTest {
     @Test
     void authenticate() {
         //given jwt 토큰 생성
-        String token = jwtUtils.generateToken("testemail@naver.com", "testnickname", List.of(ROLE_USER));
+        String token = jwtUtils.generateToken(1L, "testemail@naver.com", "testnickname", List.of(ROLE_USER));
 
         //when jwt 토큰 인증
         JWTAuthenticationToken jwtAuthenticationToken = (JWTAuthenticationToken) jwtTokenProvider.authenticate(

@@ -34,7 +34,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         log.info("OAuth2LoginSuccessHandler.onAuthenticationSuccess() 실행 - OAuth2 로그인 성공");
 
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-        String jwtToken = jwtUtils.generateToken(customOAuth2User.getEmail(), customOAuth2User.getNickname(), customOAuth2User.getAuthorities());
+        String jwtToken = jwtUtils.generateToken(customOAuth2User);
         log.info("JWT 토큰 생성: {}", jwtToken);
         CookieUtils.saveAccessTokenCookie(response, jwtToken, null, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
         clearAuthenticationAttributes(request);
