@@ -96,7 +96,7 @@ public class JWTUtils {
 
     public String getEmail(String token) {
         Claims claims = decodeToken(token);
-        return claims.getSubject();
+        return claims.get(CLAIM_EMAIL_KEY, String.class);
     }
 
     public String getNickname(String token) {
