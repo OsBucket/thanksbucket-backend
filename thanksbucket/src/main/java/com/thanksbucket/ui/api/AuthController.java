@@ -40,7 +40,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request, @AuthenticationPrincipal AuthMember authMember) {
-        Long memberId = authService.signup(request, authMember.getEmail());
+        Long memberId = authService.signup(request, authMember.getMemberId());
         Member member = authService.findById(memberId);
         String jwtToken = jwtUtils.generateToken(member);
         log.debug("회원가입 후 jwtToken: {}", jwtToken);
