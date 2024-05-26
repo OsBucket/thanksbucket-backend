@@ -16,8 +16,10 @@ public class OAuth2UserInfoFactory {
         if (socialType == SocialType.KAKAO) {
             return ofKakao(attributes);
         }
+        if (socialType == SocialType.GOOGLE) {
+            return ofGoogle(attributes);
+        }
         throw new IllegalArgumentException("지원하지 않는 소셜 타입입니다.");
-//        return ofGoogle(userNameAttributeName, attributes);
     }
 
     private static OAuth2UserInfo ofNaver(Map<String, Object> attributes) {
@@ -28,10 +30,7 @@ public class OAuth2UserInfoFactory {
         return new KakaoOAuth2UserInfo(attributes);
     }
 
-//    public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
-//        return OAuthAttributes.builder()
-//                .nameAttributeKey(userNameAttributeName)
-//                .oauth2UserInfo(new GoogleOAuth2UserInfo(attributes))
-//                .build();
-//    }
+    public static OAuth2UserInfo ofGoogle(Map<String, Object> attributes) {
+        return new GoogleOAuth2UserInfo(attributes);
+    }
 }

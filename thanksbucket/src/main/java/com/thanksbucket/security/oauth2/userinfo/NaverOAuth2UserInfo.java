@@ -19,7 +19,6 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
-    @NotNull
     public String getEmail() {
         Map<String, Object> response = getResponse();
         return (String) response.get("email");
