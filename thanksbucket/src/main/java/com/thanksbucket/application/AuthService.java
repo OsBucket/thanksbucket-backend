@@ -30,8 +30,8 @@ public class AuthService {
     }
 
     @Transactional
-    public Long signup(SignupRequest request, String email) {
-        Member member = authMemberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("인증에 성공한 유저가 존재하지 않습니다."));
+    public Long signup(SignupRequest request, Long memberId) {
+        Member member = authMemberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("소셜 인증에 성공한 유저가 아닙니다."));
         member.validateBeforeSignedUp();
         if (request.getOccupationId() != null) {
             Occupation occupation = occupationService.findById(request.getOccupationId());
