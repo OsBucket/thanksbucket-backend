@@ -44,3 +44,9 @@ src/main/resources/*.properties
 /src/main/resources-env/preview/*.properties
 
 /src/test/resources/*.properties
+
+/src/main/resources-env/production/*.yaml
+/src/main/resources-env/staging/*.yaml
+/src/main/resources-env/preview/*.yaml
+
+/src/test/resources/*.yaml

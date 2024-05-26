@@ -1,5 +1,8 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
+import com.thanksbucket.domain.member.Member;
+import com.thanksbucket.domain.member.MemberRole;
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -11,44 +14,54 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-
-import static com.thanksbucket.security.authentication.userdetails.AuthMember.DEFAULT_ROLE;
 
 @Component
 @Slf4j
 public class JWTUtils {
-    private static final String CLAIM_AUTHORITIES_KEY = "AUTH";
+    private static final String CLAIM_AUTHORITIES_KEY = "AUTHORITIES";
+    private static final String CLAIM_NICKNAME_KEY = "NICKNAME";
     private final String SECRET_KEY;
-    private final long EXPIRE_MINUTES;
+    private final long ACCESS_EXPIRE_MINUTE;
+    private final long REFRESH_EXPIRE_MINUTE;
 
-    private final Key key;
+    private final SecretKey key;
 
-    public JWTUtils(@Value("${jwt.token.secret-key}") String secretKey, @Value("${jwt.token.access-token-expire-minutes}") long expireMinutes) {
+    public JWTUtils(@Value("${jwt.secret-key}") String secretKey,
+                    @Value("${jwt.access-token.expire-minutes}") long accessExpireMinutes,
+                    @Value("${jwt.refresh-token.expire-minutes}") long refreshExpireMinutes
+    ) {
         this.SECRET_KEY = secretKey;
-        this.EXPIRE_MINUTES = expireMinutes;
+        this.ACCESS_EXPIRE_MINUTE = accessExpireMinutes;
+        this.REFRESH_EXPIRE_MINUTE = refreshExpireMinutes;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
-    public String generateToken(String username, Collection<GrantedAuthority> authorities) {
+    public String generateToken(Member member) {
+        return generateToken(member.getEmail(), member.getNickname(), List.of(member.getMemberRole()));
+    }
+
+    public String generateToken(AuthMember authMember) {
+        return generateToken(authMember.getEmail(), authMember.getNickname(), authMember.getAuthorities());
+    }
+
+    public String generateToken(String email, String nickname, Collection<? extends GrantedAuthority> memberRoles) {
         return Jwts.builder()
                 .issuer("ThanksBucket")
-                .subject("Authorization")
-                .audience().add(username).and()
+                .subject(email)
                 .expiration(java.sql.Timestamp.valueOf(getExpireDate()))
-                .notBefore(new Date())
                 .issuedAt(new Date())
-                .id(username)
-                .claims().add(CLAIM_AUTHORITIES_KEY, authorities).and()
+                .claims()
+                .add(CLAIM_NICKNAME_KEY, nickname)
+                .add(CLAIM_AUTHORITIES_KEY, memberRoles.stream().map(GrantedAuthority::getAuthority).toList())
+                .and()
                 .signWith(key)
                 .compact();
     }
@@ -56,7 +69,7 @@ public class JWTUtils {
     public Claims decodeToken(String token) {
         try {
             return Jwts.parser()
-                    .verifyWith((SecretKey) key)
+                    .verifyWith(key)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -69,22 +82,23 @@ public class JWTUtils {
         }
     }
 
-    public Collection<GrantedAuthority> getAuthorities(String token) {
+    public String getEmail(String token) {
         Claims claims = decodeToken(token);
-        List<Map<String, GrantedAuthority>> roles = claims.get(CLAIM_AUTHORITIES_KEY, List.class);
-        // TODO Authorities 반환값이 이상함 확인 필요
-        // TODO 임시 하드 코딩
-        return List.of(new SimpleGrantedAuthority(DEFAULT_ROLE));
-//        return roles.stream().map(authorities -> authorities.get("authority")).collect(Collectors.toList());
+        return claims.getSubject();
     }
 
-    public String getUsername(String token) {
+    public String getNickname(String token) {
         Claims claims = decodeToken(token);
-        String id = claims.getId();
-        return id;
+        return claims.get(CLAIM_NICKNAME_KEY, String.class);
+    }
+
+    public List<MemberRole> getAuthorities(String token) {
+        Claims claims = decodeToken(token);
+        ArrayList<String> roles = claims.get(CLAIM_AUTHORITIES_KEY, ArrayList.class);
+        return roles.stream().map(MemberRole::of).toList();
     }
 
     public LocalDateTime getExpireDate() {
-        return LocalDateTime.now().plusMinutes(EXPIRE_MINUTES);
+        return LocalDateTime.now().plusMinutes(ACCESS_EXPIRE_MINUTE);
     }
 }

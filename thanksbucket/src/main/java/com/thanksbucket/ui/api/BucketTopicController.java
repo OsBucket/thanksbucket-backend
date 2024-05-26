@@ -6,8 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,7 +21,7 @@ public class BucketTopicController {
     private final BucketTopicService bucketTopicService;
 
     @GetMapping("")
-    public ResponseEntity<List<BucketTopicResponse>> findAllByBucketId(@AuthenticationPrincipal User user, @NotNull @RequestParam Long bucketId) {
+    public ResponseEntity<List<BucketTopicResponse>> findAllByBucketId(@NotNull @RequestParam Long bucketId) {
         return ResponseEntity.ok(bucketTopicService.findAllByBucketId(bucketId));
     }
 }

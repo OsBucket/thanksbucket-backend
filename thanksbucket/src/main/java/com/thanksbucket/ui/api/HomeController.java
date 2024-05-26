@@ -20,15 +20,15 @@ public class HomeController {
     private String swaggerPath;
 
 
-    @GetMapping("/")
-    public ResponseEntity<Object> home() {
-        log.debug("redirect to swagger");
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(URI.create(swaggerPath));
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .headers(httpHeaders)
-                .build();
-    }
+//    @GetMapping("/")
+//    public ResponseEntity<Object> home() {
+//        log.debug("redirect to swagger");
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.setLocation(URI.create(swaggerPath));
+//        return ResponseEntity.status(HttpStatus.FOUND)
+//                .headers(httpHeaders)
+//                .build();
+//    }
 
     @GetMapping("/api/health")
     public ResponseEntity<String> health() {

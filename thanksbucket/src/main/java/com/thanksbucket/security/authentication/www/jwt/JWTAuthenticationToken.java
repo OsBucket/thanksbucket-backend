@@ -24,8 +24,8 @@ public class JWTAuthenticationToken extends AbstractAuthenticationToken {
         return new JWTAuthenticationToken(null, header, null, false);
     }
 
-    public static JWTAuthenticationToken authenticated(AuthMember authMember, String header, Collection<? extends GrantedAuthority> authorities) {
-        return new JWTAuthenticationToken(authMember, header, authorities, true);
+    public static JWTAuthenticationToken authenticated(AuthMember authMember, String header) {
+        return new JWTAuthenticationToken(authMember, header, authMember.getAuthorities(), true);
     }
 
 

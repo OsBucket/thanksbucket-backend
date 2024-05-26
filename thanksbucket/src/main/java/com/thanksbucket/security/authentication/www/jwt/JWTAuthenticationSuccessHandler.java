@@ -39,12 +39,13 @@ public class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHan
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        String jwtToken = jwtUtils.generateToken(authMember.getUsername(), authMember.getAuthorities());
+        String jwtToken = jwtUtils.generateToken(authMember);
 
         //TODO Session 하위호환성
         addSuccessHandler.onAuthenticationSuccess(request, response, authentication);
 
-        JWTResponse body = new JWTResponse(authMember.getUsername(), jwtToken, jwtUtils.getExpireDate());
+        //TODO 리프레시 토큰추가
+        JWTResponse body = new JWTResponse(authMember.getEmail(), jwtToken, jwtToken);
         log.info("로그인 성공: {}", body);
         //TODO 유효기간 가져오는 하드코딩
         objectMapper.registerModule(new JavaTimeModule()).writeValue(response.getWriter(),
