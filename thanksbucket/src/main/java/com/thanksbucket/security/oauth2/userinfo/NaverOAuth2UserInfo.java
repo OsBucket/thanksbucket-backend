@@ -12,12 +12,14 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @NotNull
     public String getSocialId() {
         Map<String, Object> response = getResponse();
         return String.valueOf(response.get("id"));
     }
 
     @Override
+    @NotNull
     public String getEmail() {
         Map<String, Object> response = getResponse();
         return (String) response.get("email");
