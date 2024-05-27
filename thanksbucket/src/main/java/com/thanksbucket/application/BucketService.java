@@ -24,6 +24,20 @@ public class BucketService {
     private final BucketRepository bucketRepository;
     private final TopicRepository topicRepository;
 
+    public List<Bucket> findAll() {
+        return bucketRepository.findBucketsOrderByIdDesc();
+    }
+
+    public Bucket findById(Long bucketId) {
+        return bucketRepository.findById(bucketId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
+    }
+
+    public Bucket findByNickname(String nickname) {
+        Member member = memberService.findByNickname(nickname);
+        return this.findById(member.getId());
+    }
+
     @Transactional
     public Long create(Long memberId, CreateBucketRequest request) {
         Member member = memberService.findById(memberId);
@@ -38,23 +52,10 @@ public class BucketService {
         return bucketRepository.save(bucket).getId();
     }
 
-    public List<BucketResponse> findAll(Long memberId) {
-        Member member = memberService.findById(memberId);
-        List<Bucket> buckets = bucketRepository.findBucketsByMemberOrderByIdDesc(member);
-        return buckets.stream().map(BucketResponse::new).toList();
-    }
-
-    public BucketResponse findById(Long memberId, Long bucketId) {
-        Member member = memberService.findById(memberId);
-        Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
-        bucket.validateOwner(member);
-        return new BucketResponse(bucket);
-    }
-
     @Transactional
     public Long update(Long memberId, Long bucketId, UpdateBucketRequest request) {
         Member member = memberService.findById(memberId);
-        Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
+        Bucket bucket = this.findById(bucketId);
         List<Topic> topics = topicRepository.findAllById(request.getTopicIds());
 
         bucket.update(member, request.getTitle(), request.getGoalDate());
@@ -71,7 +72,7 @@ public class BucketService {
     @Transactional
     public Long patch(Long memberId, Long bucketId, PatchBucketRequest request) {
         Member member = memberService.findById(memberId);
-        Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
+        Bucket bucket = this.findById(bucketId);
         bucket.validateOwner(member);
         bucket.updateIsDone(request.getIsDone());
         return bucket.getId();
@@ -81,7 +82,7 @@ public class BucketService {
     @Transactional
     public void delete(Long memberId, Long bucketId) {
         Member member = memberService.findById(memberId);
-        Bucket bucket = bucketRepository.findById(bucketId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
+        Bucket bucket = this.findById(bucketId);
         bucket.validateOwner(member);
         bucketRepository.delete(bucket);
     }
