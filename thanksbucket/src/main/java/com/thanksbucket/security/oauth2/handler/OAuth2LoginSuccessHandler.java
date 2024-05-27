@@ -1,6 +1,7 @@
 package com.thanksbucket.security.oauth2.handler;
 
 import com.thanksbucket.common.utils.CookieUtils;
+import com.thanksbucket.domain.member.MemberRole;
 import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
 import com.thanksbucket.security.oauth2.CustomOAuth2User;
 import jakarta.servlet.ServletException;
@@ -17,6 +18,8 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+    public static final String SIGNUP_URL = "/auth/signup";
+    public static final String SIMPLE_URL = "/";
     private final JWTUtils jwtUtils;
     private final String DEFAULT_REDIRECT_URL; // TODO 추후에 SimpleAuthenticationSuccessHandler 사용하기
     private final Integer JWT_ACCESS_TOKEN_COOKIE_MAX_AGE;
@@ -38,12 +41,19 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         log.info("JWT 토큰 생성: {}", jwtToken);
         CookieUtils.saveAccessTokenCookie(response, jwtToken, null, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
         clearAuthenticationAttributes(request);
-        // 요청 Header 부터 리다이렉트 URL을 가져옴
-        String redirectURI = request.getHeader("OAUTH2_REDIRECT_URI");
-        if (redirectURI == null) {
-            redirectURI = DEFAULT_REDIRECT_URL;
-        }
+        String redirectURI = getRedirectURI(customOAuth2User);
         getRedirectStrategy().sendRedirect(request, response, redirectURI);
         log.info("OAuth2 로그인 성공 후 리다이렉트 : {}", redirectURI);
+    }
+
+    private String getRedirectURI(CustomOAuth2User customOAuth2User) {
+        String redirectURI = DEFAULT_REDIRECT_URL;
+        if (customOAuth2User.getAuthorities().contains(MemberRole.ROLE_GUEST)) {
+            return redirectURI + SIGNUP_URL;
+        }
+        if (customOAuth2User.getAuthorities().contains(MemberRole.ROLE_USER)) {
+            return redirectURI + SIMPLE_URL + customOAuth2User.getNickname();
+        }
+        return redirectURI;
     }
 }
