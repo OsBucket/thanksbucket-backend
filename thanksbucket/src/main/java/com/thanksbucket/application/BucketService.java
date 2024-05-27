@@ -5,7 +5,6 @@ import com.thanksbucket.domain.bucket.BucketRepository;
 import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.topic.Topic;
 import com.thanksbucket.domain.topic.TopicRepository;
-import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
 import com.thanksbucket.ui.dto.CreateBucketTodoRequest;
 import com.thanksbucket.ui.dto.PatchBucketRequest;
@@ -20,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BucketService {
-    private final MemberService memberService;
     private final BucketRepository bucketRepository;
+    private final MemberService memberService;
     private final TopicRepository topicRepository;
 
     public List<Bucket> findAll() {

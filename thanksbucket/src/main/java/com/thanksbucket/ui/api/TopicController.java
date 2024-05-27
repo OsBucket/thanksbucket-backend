@@ -1,6 +1,7 @@
 package com.thanksbucket.ui.api;
 
 import com.thanksbucket.application.TopicService;
+import com.thanksbucket.domain.topic.Topic;
 import com.thanksbucket.ui.dto.TopicResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class TopicController {
 
     @GetMapping("")
     public ResponseEntity<List<TopicResponse>> findAll() {
-        return ResponseEntity.ok(topicService.findAll());
+        List<Topic> topics = topicService.findAll();
+        return ResponseEntity.ok(topics.stream().map(TopicResponse::new).toList());
     }
 }
