@@ -24,7 +24,7 @@ public class BucketService {
     private final TopicRepository topicRepository;
 
     public List<Bucket> findAll() {
-        return bucketRepository.findBucketsOrderByIdDesc();
+        return bucketRepository.findAllByOrderByIdDesc();
     }
 
     public Bucket findById(Long bucketId) {
