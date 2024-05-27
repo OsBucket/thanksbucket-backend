@@ -34,10 +34,11 @@ public class JWTTokenProvider implements AuthenticationProvider {
             throw new AuthenticationServiceException("유효하지 않은 토큰 형식입니다.");
         }
         String token = split[1];
+        Long memberId = jwtUtils.getMemberId(token);
         String email = jwtUtils.getEmail(token);
         String nickname = jwtUtils.getNickname(token);
         Collection<? extends GrantedAuthority> authorities = jwtUtils.getAuthorities(token);
-        AuthMember authMember = AuthMember.fromToken(email, nickname, token, authorities);
+        AuthMember authMember = AuthMember.fromToken(memberId, email, nickname, token, authorities);
         return JWTAuthenticationToken.authenticated(authMember, token);
     }
 

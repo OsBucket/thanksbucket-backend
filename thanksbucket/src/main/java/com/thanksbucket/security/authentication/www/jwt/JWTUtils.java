@@ -3,6 +3,7 @@ package com.thanksbucket.security.authentication.www.jwt;
 import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.member.MemberRole;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
+import com.thanksbucket.security.oauth2.CustomOAuth2User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -27,6 +28,7 @@ import java.util.List;
 @Slf4j
 public class JWTUtils {
     private static final String CLAIM_AUTHORITIES_KEY = "AUTHORITIES";
+    private static final String CLAIM_EMAIL_KEY = "EMAIL";
     private static final String CLAIM_NICKNAME_KEY = "NICKNAME";
     private final String SECRET_KEY;
     private final long ACCESS_EXPIRE_MINUTE;
@@ -44,21 +46,26 @@ public class JWTUtils {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
+    public String generateToken(CustomOAuth2User customOAuth2User) {
+        return generateToken(customOAuth2User.getMemberId(), customOAuth2User.getEmail(), customOAuth2User.getNickname(), customOAuth2User.getAuthorities());
+    }
+
     public String generateToken(Member member) {
-        return generateToken(member.getEmail(), member.getNickname(), List.of(member.getMemberRole()));
+        return generateToken(member.getId(), member.getEmail(), member.getNickname(), List.of(member.getMemberRole()));
     }
 
     public String generateToken(AuthMember authMember) {
-        return generateToken(authMember.getEmail(), authMember.getNickname(), authMember.getAuthorities());
+        return generateToken(authMember.getMemberId(), authMember.getEmail(), authMember.getNickname(), authMember.getAuthorities());
     }
 
-    public String generateToken(String email, String nickname, Collection<? extends GrantedAuthority> memberRoles) {
+    public String generateToken(Long memberId, String email, String nickname, Collection<? extends GrantedAuthority> memberRoles) {
         return Jwts.builder()
                 .issuer("ThanksBucket")
-                .subject(email)
+                .subject(String.valueOf(memberId))
                 .expiration(java.sql.Timestamp.valueOf(getExpireDate()))
                 .issuedAt(new Date())
                 .claims()
+                .add(CLAIM_EMAIL_KEY, email)
                 .add(CLAIM_NICKNAME_KEY, nickname)
                 .add(CLAIM_AUTHORITIES_KEY, memberRoles.stream().map(GrantedAuthority::getAuthority).toList())
                 .and()
@@ -82,9 +89,14 @@ public class JWTUtils {
         }
     }
 
+    public Long getMemberId(String token) {
+        Claims claims = decodeToken(token);
+        return Long.parseLong(claims.getSubject());
+    }
+
     public String getEmail(String token) {
         Claims claims = decodeToken(token);
-        return claims.getSubject();
+        return claims.get(CLAIM_EMAIL_KEY, String.class);
     }
 
     public String getNickname(String token) {
