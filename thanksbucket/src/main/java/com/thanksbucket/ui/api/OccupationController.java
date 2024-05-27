@@ -1,6 +1,7 @@
 package com.thanksbucket.ui.api;
 
 import com.thanksbucket.application.OccupationService;
+import com.thanksbucket.domain.occupation.Occupation;
 import com.thanksbucket.ui.dto.OccupationResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class OccupationController {
 
     @GetMapping("")
     public ResponseEntity<List<OccupationResponse>> findAll() {
-        return ResponseEntity.ok(occupationService.findAll());
+        List<Occupation> occupations = occupationService.findAll();
+        return ResponseEntity.ok(occupations.stream().map(OccupationResponse::new).toList());
     }
 }
