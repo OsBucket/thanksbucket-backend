@@ -31,12 +31,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.debug("JWT Filter PASS START");
         String header = request.getHeader(AUTHORIZATION_HEADER);
-        Cookie cookie = CookieUtils.getCookie(request, AUTHORIZATION_HEADER).orElse(null);
-        //TODO header 없을 때 쿠키로 처리
-        if (header == null && cookie != null) {
-            String token = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
-            header = token;
-        }
         Authentication unauthenticated = JWTAuthenticationToken.unauthenticated(header);
         try {
             Authentication authResult = this.authenticationManager.authenticate(unauthenticated);
