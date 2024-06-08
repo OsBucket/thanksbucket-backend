@@ -44,9 +44,8 @@ public class AuthController {
         Member member = authService.findById(memberId);
         String jwtToken = jwtUtils.generateToken(member);
         log.debug("회원가입 후 jwtToken: {}", jwtToken);
-        ResponseCookie cookie = CookieUtils.createAccessTokenCookie(jwtToken, null, JWT_ACCESS_TOKEN_COOKIE_MAX_AGE);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
                 .build();
     }
 
