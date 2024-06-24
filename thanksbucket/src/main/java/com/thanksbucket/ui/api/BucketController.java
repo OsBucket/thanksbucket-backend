@@ -6,10 +6,12 @@ import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
 import com.thanksbucket.ui.dto.PatchBucketRequest;
+import com.thanksbucket.ui.dto.SearchBucketRequest;
 import com.thanksbucket.ui.dto.UpdateBucketRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,22 +34,22 @@ import java.util.List;
 public class BucketController {
     private final BucketService bucketService;
 
-    @GetMapping("")
-    public ResponseEntity<List<BucketResponse>> findAll() {
-        List<Bucket> buckets = bucketService.findAll();
-        return ResponseEntity.ok(buckets.stream().map(BucketResponse::new).toList());
-    }
-
-    @GetMapping("/{memberNickname}")
-    public ResponseEntity<BucketResponse> findByNickname(@PathVariable(name = "memberNickname") String memberNickname) {
-        Bucket bucket = bucketService.findByNickname(memberNickname);
-        return ResponseEntity.ok(new BucketResponse(bucket));
-    }
-
     @PostMapping("")
     public ResponseEntity<Void> create(@AuthenticationPrincipal AuthMember authMember, @Valid @RequestBody CreateBucketRequest request) {
         Long bucketId = bucketService.create(authMember.getMemberId(), request);
         return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<BucketResponse>> findAll(@ParameterObject SearchBucketRequest request) {
+        List<Bucket> buckets = bucketService.findBy(request);
+        return ResponseEntity.ok(buckets.stream().map(BucketResponse::new).toList());
+    }
+
+    @GetMapping("/{bucketId}")
+    public ResponseEntity<BucketResponse> findById(@PathVariable(name = "bucketId") Long bucketId) {
+        Bucket bucket = bucketService.findById(bucketId);
+        return ResponseEntity.ok(new BucketResponse(bucket));
     }
 
     @PutMapping("/{bucketId}")

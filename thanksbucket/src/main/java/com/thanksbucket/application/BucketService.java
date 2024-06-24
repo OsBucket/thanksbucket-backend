@@ -8,8 +8,10 @@ import com.thanksbucket.domain.topic.TopicRepository;
 import com.thanksbucket.ui.dto.CreateBucketRequest;
 import com.thanksbucket.ui.dto.CreateBucketTodoRequest;
 import com.thanksbucket.ui.dto.PatchBucketRequest;
+import com.thanksbucket.ui.dto.SearchBucketRequest;
 import com.thanksbucket.ui.dto.UpdateBucketRequest;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +25,26 @@ public class BucketService {
     private final MemberService memberService;
     private final TopicRepository topicRepository;
 
-    public List<Bucket> findAll() {
-        return bucketRepository.findAllByOrderByIdDesc();
-    }
-
     public Bucket findById(Long bucketId) {
         return bucketRepository.findById(bucketId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
     }
 
-    public Bucket findByNickname(String nickname) {
+    public List<Bucket> findBy(@ParameterObject SearchBucketRequest request) {
+        // TODO 쿼리 파라미터 리팩토링
+        if (request.getNickname() != null) {
+            return this.findByNickname(request.getNickname());
+        }
+        return this.findAll();
+    }
+
+    private List<Bucket> findAll() {
+        return bucketRepository.findAllByOrderByIdDesc();
+    }
+
+    private List<Bucket> findByNickname(String nickname) {
         Member member = memberService.findByNickname(nickname);
-        return this.findById(member.getId());
+        return bucketRepository.findAllByMemberId(member.getId());
     }
 
     @Transactional
