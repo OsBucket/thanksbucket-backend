@@ -12,6 +12,8 @@ import com.thanksbucket.ui.dto.SearchBucketRequest;
 import com.thanksbucket.ui.dto.UpdateBucketRequest;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,21 +32,21 @@ public class BucketService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
     }
 
-    public List<Bucket> findBy(@ParameterObject SearchBucketRequest request) {
+    public Page<Bucket> findBy(@ParameterObject SearchBucketRequest request) {
         // TODO 쿼리 파라미터 리팩토링
         if (request.getNickname() != null) {
-            return this.findByNickname(request.getNickname());
+            return this.findByNickname(request.toPageable(), request.getNickname());
         }
-        return this.findAll();
+        return this.findAll(request.toPageable());
     }
 
-    private List<Bucket> findAll() {
-        return bucketRepository.findAllByOrderByIdDesc();
+    private Page<Bucket> findAll(Pageable pageable) {
+        return bucketRepository.findAll(pageable);
     }
 
-    private List<Bucket> findByNickname(String nickname) {
+    private Page<Bucket> findByNickname(Pageable pageable, String nickname) {
         Member member = memberService.findByNickname(nickname);
-        return bucketRepository.findAllByMemberId(member.getId());
+        return bucketRepository.findAllByMemberId(pageable, member.getId());
     }
 
     @Transactional
