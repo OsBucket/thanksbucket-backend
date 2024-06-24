@@ -15,6 +15,7 @@ public class BucketResponse {
     private final LocalDate goalDate;
 
     private final Boolean isDone;
+    private final MemberResponse member;
     private final List<BucketTodoResponse> bucketTodos;
     private final List<TopicResponse> bucketTopics;
 
@@ -23,6 +24,7 @@ public class BucketResponse {
         this.title = bucket.getTitle();
         this.goalDate = bucket.getGoalDate();
         this.isDone = bucket.isDone();
+        this.member = new MemberResponse(bucket.getMember());
         this.bucketTodos = bucket.getBucketTodos().stream()
                 .map(BucketTodoResponse::new)
                 .toList();
