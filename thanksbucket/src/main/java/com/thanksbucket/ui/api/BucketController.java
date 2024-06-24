@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/buckets")
@@ -41,9 +41,9 @@ public class BucketController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<BucketResponse>> findAll(@ParameterObject SearchBucketRequest request) {
-        List<Bucket> buckets = bucketService.findBy(request);
-        return ResponseEntity.ok(buckets.stream().map(BucketResponse::new).toList());
+    public ResponseEntity<Page<BucketResponse>> findAll(@ParameterObject SearchBucketRequest request) {
+        Page<Bucket> buckets = bucketService.findBy(request);
+        return ResponseEntity.ok(buckets.map(BucketResponse::new));
     }
 
     @GetMapping("/{bucketId}")
