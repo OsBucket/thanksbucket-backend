@@ -104,9 +104,10 @@ public class Member extends BaseTimeEntity {
   }
 
   //TODO 삭제 예정
-  public Member(String email, String nickname) {
+  public Member(String email, String nickname, MemberRole memberRole) {
     this.email = email;
     this.nickname = nickname;
+    this.memberRole = memberRole;
   }
 
   public void signup(String nickname, LocalDate birthday, String discoveryPath) {
