@@ -39,14 +39,14 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest request, @AuthenticationPrincipal AuthMember authMember) {
+    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request, @AuthenticationPrincipal AuthMember authMember) {
         Long memberId = authService.signup(request, authMember.getMemberId());
         Member member = authService.findById(memberId);
         String jwtToken = jwtUtils.generateToken(member);
         log.debug("회원가입 후 jwtToken: {}", jwtToken);
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
-                .build();
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+            .body("Bearer " + jwtToken);
     }
 
     @GetMapping("/logout")
