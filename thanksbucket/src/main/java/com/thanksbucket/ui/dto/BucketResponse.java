@@ -1,7 +1,7 @@
 package com.thanksbucket.ui.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.thanksbucket.core.bucket.query.BucketData;
+import com.thanksbucket.core.bucket.query.domain.BucketData;
 import java.time.LocalDate;
 import lombok.Getter;
 

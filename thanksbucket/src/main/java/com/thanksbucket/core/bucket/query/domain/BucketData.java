@@ -1,4 +1,4 @@
-package com.thanksbucket.core.bucket.query;
+package com.thanksbucket.core.bucket.query.domain;
 
 import com.thanksbucket.base.domain.BaseTimeEntity;
 import com.thanksbucket.core.bucket.command.domain.BucketGoalDate;

@@ -1,14 +1,15 @@
 package com.thanksbucket.core.bucket.ui;
 
 import com.thanksbucket.core.bucket.command.application.BucketService;
+import com.thanksbucket.core.bucket.command.application.FinishBucketService;
 import com.thanksbucket.core.bucket.command.application.StartBucketService;
 import com.thanksbucket.core.bucket.command.application.UpdateBucketService;
-import com.thanksbucket.core.bucket.query.BucketData;
-import com.thanksbucket.core.bucket.ui.dto.StartBucketRequest;
-import com.thanksbucket.core.bucket.ui.dto.UpdateBucketRequest;
+import com.thanksbucket.core.bucket.command.application.dto.StartBucketRequest;
+import com.thanksbucket.core.bucket.command.application.dto.UpdateBucketRequest;
+import com.thanksbucket.core.bucket.query.application.BucketQueryService;
+import com.thanksbucket.core.bucket.query.domain.BucketData;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import com.thanksbucket.ui.dto.BucketResponse;
-import com.thanksbucket.ui.dto.PatchBucketRequest;
 import com.thanksbucket.ui.dto.SearchBucketRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -34,9 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class BucketController {
 
+  private final BucketQueryService bucketQueryService;
   private final BucketService bucketService;
   private final StartBucketService startBucketService;
   private final UpdateBucketService updateBucketService;
+  private final FinishBucketService finishBucketService;
 
   @PostMapping("")
   public ResponseEntity<Void> create(@AuthenticationPrincipal AuthMember authMember,
@@ -50,13 +53,13 @@ public class BucketController {
       @AuthenticationPrincipal AuthMember authMember,
       @ParameterObject SearchBucketRequest request) {
     System.out.println("authMember = " + authMember);
-    Page<BucketData> buckets = bucketService.findBy(request);
+    Page<BucketData> buckets = bucketQueryService.findBy(request);
     return ResponseEntity.ok(buckets.map(BucketResponse::new));
   }
 
   @GetMapping("/{bucketId}")
   public ResponseEntity<BucketResponse> findById(@PathVariable(name = "bucketId") Long bucketId) {
-    BucketData bucket = bucketService.findById(bucketId);
+    BucketData bucket = bucketQueryService.findById(bucketId);
     return ResponseEntity.ok(new BucketResponse(bucket));
   }
 
@@ -65,15 +68,22 @@ public class BucketController {
       @PathVariable(name = "bucketId") Long bucketId,
       @Valid @RequestBody UpdateBucketRequest request) {
     updateBucketService.update(authMember.getMemberId(), bucketId, request);
-    return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
+    return ResponseEntity.noContent().build();
   }
 
-  @PatchMapping("/{bucketId}")
-  public ResponseEntity<Void> patch(@AuthenticationPrincipal AuthMember authMember,
+  @PatchMapping("/{bucketId}/finish")
+  public ResponseEntity<Void> bucketFinish(@AuthenticationPrincipal AuthMember authMember,
+      @PathVariable(name = "bucketId") Long bucketId) {
+    finishBucketService.finishBucket(authMember.getMemberId(), bucketId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PatchMapping("/{bucketId}/{bucketTodoId}/finish")
+  public ResponseEntity<Void> bucketTodoFinish(@AuthenticationPrincipal AuthMember authMember,
       @PathVariable(name = "bucketId") Long bucketId,
-      @Valid @RequestBody PatchBucketRequest request) {
-    bucketService.patch(authMember.getMemberId(), bucketId, request);
-    return ResponseEntity.created(URI.create("/api/buckets/" + bucketId)).build();
+      @PathVariable(name = "bucketTodoId") Long bucketTodoId) {
+    finishBucketService.finishBucketTodo(authMember.getMemberId(), bucketId, bucketTodoId);
+    return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/{bucketId}")

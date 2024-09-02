@@ -21,9 +21,12 @@ public class BucketGoalDate extends ValueObject<BucketGoalDate> {
   }
 
   public static BucketGoalDate from(LocalDate goalDate) {
+    return new BucketGoalDate(goalDate);
+  }
+
+  public void validateFuture() {
     if (goalDate.isBefore(LocalDate.now())) {
       throw new IllegalArgumentException(String.format("목표일은 %s 이후여야 합니다", LocalDate.now()));
     }
-    return new BucketGoalDate(goalDate);
   }
 }

@@ -1,10 +1,10 @@
 package com.thanksbucket.core.bucket.command.application;
 
+import com.thanksbucket.core.bucket.command.application.dto.StartBucketRequest;
 import com.thanksbucket.core.bucket.command.domain.Bucket;
 import com.thanksbucket.core.bucket.command.domain.BucketGoalDate;
 import com.thanksbucket.core.bucket.command.domain.BucketRepository;
 import com.thanksbucket.core.bucket.command.domain.BucketTodo;
-import com.thanksbucket.core.bucket.ui.dto.StartBucketRequest;
 import com.thanksbucket.core.topic.domain.Topic;
 import com.thanksbucket.core.topic.domain.TopicRepository;
 import java.util.List;

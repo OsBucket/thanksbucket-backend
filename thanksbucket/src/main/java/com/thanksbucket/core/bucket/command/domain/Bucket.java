@@ -1,6 +1,7 @@
 package com.thanksbucket.core.bucket.command.domain;
 
 import com.thanksbucket.base.domain.AggregateRoot;
+import com.thanksbucket.core.member.domain.Member;
 import com.thanksbucket.core.topic.domain.Topic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,11 +13,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity(name = "buckets")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bucket extends AggregateRoot<Bucket, Long> {
 
   @Id
@@ -58,6 +62,7 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
 
   public static Bucket start(Long memberId, String title, BucketGoalDate goalDate,
       List<BucketTodo> bucketTodos, List<Topic> topics) {
+    goalDate.validateFuture();
     return Bucket.builder()
         .memberId(memberId)
         .title(title)
@@ -67,8 +72,10 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
         .build();
   }
 
-  public void update(Long memberId, String title, BucketGoalDate goalDate) {
-    this.memberId = memberId;
+  public void update(Member member, String title, BucketGoalDate goalDate) {
+    goalDate.validateFuture();
+    this.canChange(member);
+    this.memberId = member.getId();
     this.title = title;
     this.bucketGoalDate = goalDate;
   }
@@ -89,12 +96,14 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
     topics.forEach(topic -> this.bucketTopics.add(BucketTopic.from(topic)));
   }
 
-  public void bucketFinish() {
+  public void bucketFinish(Member member) {
+    this.canChange(member);
     this.done = true;
     this.bucketTodos.forEach(BucketTodo::finish);
   }
 
-  public void todoFinish(Long todoId) {
+  public void todoFinish(Member member, Long todoId) {
+    this.canChange(member);
     this.bucketTodos.stream()
         .filter(todo -> todo.getId().equals(todoId))
         .findFirst()
@@ -110,6 +119,12 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
     }
     if (this.bucketTodos.isEmpty()) {
       throw new IllegalArgumentException("TODO는 한개 이상 등록해야합니다.");
+    }
+  }
+
+  public void canChange(Member member) {
+    if (!this.memberId.equals(member.getId())) {
+      throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
     }
   }
 }

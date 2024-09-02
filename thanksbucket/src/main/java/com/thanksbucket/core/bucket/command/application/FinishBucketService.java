@@ -8,31 +8,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @RequiredArgsConstructor
+@Service
 @Transactional
-public class BucketService {
+public class FinishBucketService {
 
   private final BucketRepository bucketRepository;
   private final MemberRepository memberRepository;
 
-//  @Transactional
-//  public Long patch(Long memberId, Long bucketId, PatchBucketRequest request) {
-//    Member member = memberService.findById(memberId);
-//    BucketData bucket = this.findById(bucketId);
-////    bucket.validateOwner(member);
-////    bucket.updateIsDone(request.getIsDone());
-//    return bucket.getId();
-//  }
-
-
-  @Transactional
-  public void delete(Long memberId, Long bucketId) {
+  public void finishBucket(Long memberId, Long bucketId) {
     Member member = memberRepository.findById(memberId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 멤버입니다."));
-    Bucket bucket = this.bucketRepository.findById(bucketId)
+    Bucket bucket = bucketRepository.findById(bucketId)
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
-    bucket.canChange(member);
-    bucketRepository.delete(bucket);
+    bucket.bucketFinish(member);
+  }
+
+  public void finishBucketTodo(Long memberId, Long bucketId, Long todoId) {
+    Member member = memberRepository.findById(memberId)
+        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 멤버입니다."));
+    Bucket bucket = bucketRepository.findById(bucketId)
+        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버킷입니다."));
+    bucket.todoFinish(member, todoId);
   }
 }

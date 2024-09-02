@@ -8,21 +8,21 @@ import org.junit.jupiter.api.Test;
 
 class BucketGoalDateTest {
 
-  static final LocalDate 어제 = LocalDate.now().minusDays(1);
-  static final LocalDate 오늘 = LocalDate.now();
-  static final LocalDate 내일 = LocalDate.now().plusDays(1);
+  static final BucketGoalDate 어제 = BucketGoalDate.from(LocalDate.now().minusDays(1));
+  static final BucketGoalDate 오늘 = BucketGoalDate.from(LocalDate.now());
+  static final BucketGoalDate 내일 = BucketGoalDate.from(LocalDate.now().plusDays(1));
 
   @Test
-  void 목표날짜생성_오늘이후_성공() {
+  void 목표날짜검증_오늘이후_성공() {
     assertAll(
-        () -> BucketGoalDate.from(오늘),
-        () -> BucketGoalDate.from(내일)
+        () -> 오늘.validateFuture(),
+        () -> 내일.validateFuture()
     );
   }
 
   @Test
-  void 목표날짜생성_오늘이전_실패() {
-    assertThatThrownBy(() -> BucketGoalDate.from(어제))
+  void 목표날짜검증_오늘이전_실패() {
+    assertThatThrownBy(() -> 어제.validateFuture())
         .isInstanceOf(IllegalArgumentException.class);
   }
 }

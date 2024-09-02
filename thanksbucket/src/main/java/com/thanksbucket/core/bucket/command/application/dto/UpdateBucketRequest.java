@@ -1,15 +1,16 @@
-package com.thanksbucket.core.bucket.ui.dto;
+package com.thanksbucket.core.bucket.command.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thanksbucket.core.bucket.command.domain.BucketTodo;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class StartBucketRequest {
+public class UpdateBucketRequest {
 
   @NotBlank
   private String title;
@@ -19,19 +20,20 @@ public class StartBucketRequest {
 
   private List<@Positive Long> topicIds;
 
-  private List<StartTodoRequest> bucketTodos;
+  private List<UpdateTodoRequest> bucketTodos;
 
   public List<BucketTodo> toBucketTodos() {
     return bucketTodos.stream()
-        .map((bucketTodoRequest) -> BucketTodo.start(bucketTodoRequest.getContent()))
+        .map(todo -> BucketTodo.create(todo.getContent(), todo.getDone()))
         .toList();
   }
 
-
   @Data
-  public static class StartTodoRequest {
+  public static class UpdateTodoRequest {
 
     @NotBlank
     private String content;
+    @NotNull
+    private Boolean done;
   }
 }
