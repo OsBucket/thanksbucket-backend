@@ -17,7 +17,7 @@ class EntityTest {
   }
 
   @Test
-  @DisplayName("VO는 모든 필드에 대해서 동등성 비교를 진행 / 필드값 다름 / 실패")
+  @DisplayName("VO는 모든 필드에 대해서 동등성 비교를 진행 / ID 다름 / 실패")
   void entityIdNotEquals() {
     SomeEntity entity1 = new SomeEntity(1L, 1);
     SomeEntity entity2 = new SomeEntity(2L, 1);

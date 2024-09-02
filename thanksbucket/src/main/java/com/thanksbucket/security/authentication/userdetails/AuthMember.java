@@ -1,39 +1,42 @@
 package com.thanksbucket.security.authentication.userdetails;
 
-import com.thanksbucket.domain.member.Member;
+import com.thanksbucket.core.member.query.domain.Member;
+import java.util.Collection;
+import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import java.util.Collection;
-import java.util.List;
-
 public class AuthMember extends User {
-    private final String email;
-    private final String nickname;
 
-    private AuthMember(Long memberId, String email, String nickname, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(String.valueOf(memberId), password, authorities);
-        this.email = email;
-        this.nickname = nickname;
-    }
+  private final String email;
+  private final String nickname;
 
-    public static AuthMember fromMember(Member member) {
-        return new AuthMember(member.getId(), member.getEmail(), member.getNickname(), member.getPassword(), List.of(member.getMemberRole()));
-    }
+  private AuthMember(Long memberId, String email, String nickname, String password,
+      Collection<? extends GrantedAuthority> authorities) {
+    super(String.valueOf(memberId), password, authorities);
+    this.email = email;
+    this.nickname = nickname;
+  }
 
-    public static AuthMember fromToken(Long memberId, String email, String nickname, String token, Collection<? extends GrantedAuthority> authorities) {
-        return new AuthMember(memberId, email, nickname, token, authorities);
-    }
+  public static AuthMember fromMember(Member member) {
+    return new AuthMember(member.getId(), member.getEmail(), member.getNickname(),
+        member.getPassword(), List.of(member.getMemberRole()));
+  }
 
-    public Long getMemberId() {
-        return Long.parseLong(getUsername());
-    }
+  public static AuthMember fromToken(Long memberId, String email, String nickname, String token,
+      Collection<? extends GrantedAuthority> authorities) {
+    return new AuthMember(memberId, email, nickname, token, authorities);
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public Long getMemberId() {
+    return Long.parseLong(getUsername());
+  }
 
-    public String getNickname() {
-        return nickname;
-    }
+  public String getEmail() {
+    return email;
+  }
+
+  public String getNickname() {
+    return nickname;
+  }
 }

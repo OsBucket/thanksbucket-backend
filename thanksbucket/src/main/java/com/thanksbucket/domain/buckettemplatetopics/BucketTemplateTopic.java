@@ -1,8 +1,8 @@
 package com.thanksbucket.domain.buckettemplatetopics;
 
 import com.thanksbucket.base.domain.BaseTimeEntity;
+import com.thanksbucket.core.topic.domain.Topic;
 import com.thanksbucket.domain.buckettemplate.BucketTemplate;
-import com.thanksbucket.domain.topic.Topic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
