@@ -45,9 +45,9 @@ class BucketTest {
   }
 
   @Test
-  void 버킷생성_done최초값은_False() {
+  void 버킷생성_시작상태() {
     Bucket bucket = Bucket.start(memberId, "버킷이름", 내일, List.of(투두), List.of(토픽));
-    assertThat(bucket.isDone()).isFalse();
+    assertThat(bucket.isFinished()).isFalse();
   }
 
   @Test
@@ -69,16 +69,29 @@ class BucketTest {
   }
 
   @Test
+  void 버킷_Start되면_하위투두도_Start() {
+    BucketTodo 투두1 = BucketTodo.start("투두1");
+    BucketTodo 투두2 = BucketTodo.start("투두2");
+    Bucket bucket = Bucket.start(memberId, "버킷이름", 내일, List.of(투두1, 투두2), List.of(토픽));
+
+    bucket.changeBucketStatus(member, ProcessStatus.START);
+
+    assertThat(bucket.isFinished()).isFalse();
+    assertThat(투두1.isFinished()).isFalse();
+    assertThat(투두2.isFinished()).isFalse();
+  }
+
+  @Test
   void 버킷_Finish되면_하위투두도_Finish() {
     BucketTodo 투두1 = BucketTodo.start("투두1");
     BucketTodo 투두2 = BucketTodo.start("투두2");
     Bucket bucket = Bucket.start(memberId, "버킷이름", 내일, List.of(투두1, 투두2), List.of(토픽));
 
-    bucket.bucketFinish(member);
+    bucket.changeBucketStatus(member, ProcessStatus.FINISH);
 
-    assertThat(bucket.isDone()).isTrue();
-    assertThat(투두1.isDone()).isTrue();
-    assertThat(투두2.isDone()).isTrue();
+    assertThat(bucket.isFinished()).isTrue();
+    assertThat(투두1.isFinished()).isTrue();
+    assertThat(투두2.isFinished()).isTrue();
   }
 
   @Test
@@ -89,11 +102,11 @@ class BucketTest {
     ReflectionTestUtils.setField(투두2, "id", 2L);
     Bucket bucket = Bucket.start(memberId, "버킷이름", 내일, List.of(투두1, 투두2), List.of(토픽));
 
-    bucket.todoFinish(member, 1L);
-    bucket.todoFinish(member, 2L);
+    bucket.changeBucketTodoStatus(member, 1L, ProcessStatus.FINISH);
+    bucket.changeBucketTodoStatus(member, 2L, ProcessStatus.FINISH);
 
-    assertThat(bucket.isDone()).isTrue();
-    assertThat(투두1.isDone()).isTrue();
-    assertThat(투두2.isDone()).isTrue();
+    assertThat(bucket.isFinished()).isTrue();
+    assertThat(투두1.isFinished()).isTrue();
+    assertThat(투두2.isFinished()).isTrue();
   }
 }

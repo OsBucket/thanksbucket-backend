@@ -2,6 +2,7 @@ package com.thanksbucket.core.bucket.command.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.thanksbucket.core.bucket.command.domain.BucketTodo;
+import com.thanksbucket.core.bucket.command.domain.ProcessStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -24,7 +25,7 @@ public class UpdateBucketRequest {
 
   public List<BucketTodo> toBucketTodos() {
     return bucketTodos.stream()
-        .map(todo -> BucketTodo.create(todo.getContent(), todo.getDone()))
+        .map(todo -> BucketTodo.create(todo.getContent(), todo.getProcessStatus()))
         .toList();
   }
 
@@ -34,6 +35,6 @@ public class UpdateBucketRequest {
     @NotBlank
     private String content;
     @NotNull
-    private Boolean done;
+    private ProcessStatus processStatus;
   }
 }

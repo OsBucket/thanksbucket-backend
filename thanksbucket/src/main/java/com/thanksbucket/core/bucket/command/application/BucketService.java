@@ -17,7 +17,7 @@ public class BucketService {
   private final MemberRepository memberRepository;
 
 //  @Transactional
-//  public Long patch(Long memberId, Long bucketId, PatchBucketRequest request) {
+//  public Long patch(Long memberId, Long bucketId, FinishBucketRequest request) {
 //    Member member = memberService.findById(memberId);
 //    BucketData bucket = this.findById(bucketId);
 ////    bucket.validateOwner(member);

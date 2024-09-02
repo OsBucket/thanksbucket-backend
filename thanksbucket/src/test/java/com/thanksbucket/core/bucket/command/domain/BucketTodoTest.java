@@ -12,8 +12,8 @@ class BucketTodoTest {
   }
 
   @Test
-  void 버킷할일생성_done최초값False() {
+  void 버킷할일생성_isFinished_False() {
     BucketTodo bucketTodo = BucketTodo.start("할일");
-    assertThat(bucketTodo.isDone()).isFalse();
+    assertThat(bucketTodo.isFinished()).isFalse();
   }
 }

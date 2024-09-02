@@ -1,4 +1,4 @@
-package com.thanksbucket.ui.dto;
+package com.thanksbucket.core.member.application.dto;
 
 import com.thanksbucket.core.member.domain.Member;
 import lombok.Getter;

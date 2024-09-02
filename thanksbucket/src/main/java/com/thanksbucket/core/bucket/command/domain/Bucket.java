@@ -6,6 +6,8 @@ import com.thanksbucket.core.topic.domain.Topic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +19,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity(name = "buckets")
 @Getter
@@ -34,8 +39,11 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
   @Column(nullable = false)
   private BucketGoalDate bucketGoalDate;
 
+  @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
-  private boolean done;
+  @JdbcTypeCode(value = SqlTypes.VARCHAR)
+  @ColumnDefault(value = "'START")
+  private ProcessStatus bucketStatus;
 
   @Column(nullable = false, name = "member_id")
   private Long memberId;
@@ -49,12 +57,13 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
   private List<BucketTopic> bucketTopics;
 
   @Builder
-  private Bucket(Long memberId, String title, BucketGoalDate bucketGoalDate, boolean done,
+  private Bucket(Long memberId, String title, BucketGoalDate bucketGoalDate,
+      ProcessStatus bucketStatus,
       List<BucketTodo> bucketTodos, List<BucketTopic> bucketTopics) {
     this.memberId = memberId;
     this.title = title;
     this.bucketGoalDate = bucketGoalDate;
-    this.done = done;
+    this.bucketStatus = bucketStatus;
     this.bucketTodos = bucketTodos;
     this.bucketTopics = bucketTopics;
     this.validate();
@@ -66,6 +75,7 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
     return Bucket.builder()
         .memberId(memberId)
         .title(title)
+        .bucketStatus(ProcessStatus.START)
         .bucketGoalDate(goalDate)
         .bucketTodos(bucketTodos)
         .bucketTopics(topics.stream().map(BucketTopic::from).toList())
@@ -96,20 +106,53 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
     topics.forEach(topic -> this.bucketTopics.add(BucketTopic.from(topic)));
   }
 
-  public void bucketFinish(Member member) {
+  public boolean isFinished() {
+    return this.bucketStatus.isFinish();
+  }
+
+  public void changeBucketStatus(Member member, ProcessStatus bucketStatus) {
     this.canChange(member);
-    this.done = true;
+    if (bucketStatus.isFinish()) {
+      bucketFinish();
+      return;
+    }
+    bucketStart();
+  }
+
+  public void changeBucketTodoStatus(Member member, Long todoId, ProcessStatus bucketStatus) {
+    this.canChange(member);
+    if (bucketStatus.isFinish()) {
+      todoFinish(todoId);
+      return;
+    }
+    todoStart(todoId);
+  }
+
+  private void bucketStart() {
+    this.bucketStatus = ProcessStatus.START;
+    this.bucketTodos.forEach(BucketTodo::start);
+  }
+
+  private void bucketFinish() {
+    this.bucketStatus = ProcessStatus.FINISH;
     this.bucketTodos.forEach(BucketTodo::finish);
   }
 
-  public void todoFinish(Member member, Long todoId) {
-    this.canChange(member);
+  private void todoStart(Long todoId) {
+    this.bucketTodos.stream()
+        .filter(todo -> todo.getId().equals(todoId))
+        .findFirst()
+        .ifPresent(BucketTodo::start);
+    this.bucketStatus = ProcessStatus.START;
+  }
+
+  private void todoFinish(Long todoId) {
     this.bucketTodos.stream()
         .filter(todo -> todo.getId().equals(todoId))
         .findFirst()
         .ifPresent(BucketTodo::finish);
-    if (this.bucketTodos.stream().allMatch(BucketTodo::isDone)) {
-      this.done = true;
+    if (this.bucketTodos.stream().allMatch(BucketTodo::isFinished)) {
+      this.bucketStatus = ProcessStatus.FINISH;
     }
   }
 

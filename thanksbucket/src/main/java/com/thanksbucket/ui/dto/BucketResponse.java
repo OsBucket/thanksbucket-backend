@@ -15,7 +15,6 @@ public class BucketResponse {
   private final Boolean isDone;
 //  private final MemberResponse member;
   //    private final List<BucketTodoResponse> bucketTodos;
-//  private final List<TopicResponse> bucketTopics;
 
   public BucketResponse(BucketData bucket) {
     this.id = bucket.getId();

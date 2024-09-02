@@ -4,7 +4,6 @@ import com.thanksbucket.application.MemberService;
 import com.thanksbucket.core.bucket.query.domain.BucketData;
 import com.thanksbucket.core.bucket.query.domain.BucketQueryRepository;
 import com.thanksbucket.core.member.domain.Member;
-import com.thanksbucket.core.topic.domain.TopicRepository;
 import com.thanksbucket.ui.dto.SearchBucketRequest;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -20,7 +19,6 @@ public class BucketQueryService {
 
   private final BucketQueryRepository bucketQueryRepository;
   private final MemberService memberService;
-  private final TopicRepository topicRepository;
 
   public BucketData findById(Long bucketId) {
     return bucketQueryRepository.findById(bucketId)

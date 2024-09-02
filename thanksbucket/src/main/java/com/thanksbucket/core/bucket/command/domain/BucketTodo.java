@@ -3,12 +3,17 @@ package com.thanksbucket.core.bucket.command.domain;
 import com.thanksbucket.base.domain.DomainEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity(name = "bucket_todos")
 @Getter
@@ -23,24 +28,34 @@ public class BucketTodo extends DomainEntity<BucketTodo, Long> {
   @Column(nullable = false)
   private String content;
 
+  @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
-  private boolean done;
+  @JdbcTypeCode(value = SqlTypes.VARCHAR)
+  @ColumnDefault(value = "'START")
+  private ProcessStatus todoStatus;
 
-  private BucketTodo(String content, boolean done) {
+  private BucketTodo(String content, ProcessStatus todoStatus) {
     this.content = content;
-    this.done = done;
+    this.todoStatus = todoStatus;
   }
 
   public static BucketTodo start(String content) {
-    return new BucketTodo(content, false);
+    return new BucketTodo(content, ProcessStatus.START);
   }
 
-  public static BucketTodo create(String content, boolean done) {
-    return new BucketTodo(content, done);
+  public static BucketTodo create(String content, ProcessStatus todoStatus) {
+    return new BucketTodo(content, todoStatus);
   }
 
+  public void start() {
+    this.todoStatus = ProcessStatus.START;
+  }
 
   public void finish() {
-    this.done = true;
+    this.todoStatus = ProcessStatus.FINISH;
+  }
+
+  public boolean isFinished() {
+    return this.todoStatus.isFinish();
   }
 }

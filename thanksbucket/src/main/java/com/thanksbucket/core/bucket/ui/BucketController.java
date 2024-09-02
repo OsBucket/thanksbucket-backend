@@ -1,9 +1,10 @@
 package com.thanksbucket.core.bucket.ui;
 
 import com.thanksbucket.core.bucket.command.application.BucketService;
-import com.thanksbucket.core.bucket.command.application.FinishBucketService;
+import com.thanksbucket.core.bucket.command.application.BucketStatusService;
 import com.thanksbucket.core.bucket.command.application.StartBucketService;
 import com.thanksbucket.core.bucket.command.application.UpdateBucketService;
+import com.thanksbucket.core.bucket.command.application.dto.FinishBucketRequest;
 import com.thanksbucket.core.bucket.command.application.dto.StartBucketRequest;
 import com.thanksbucket.core.bucket.command.application.dto.UpdateBucketRequest;
 import com.thanksbucket.core.bucket.query.application.BucketQueryService;
@@ -39,7 +40,7 @@ public class BucketController {
   private final BucketService bucketService;
   private final StartBucketService startBucketService;
   private final UpdateBucketService updateBucketService;
-  private final FinishBucketService finishBucketService;
+  private final BucketStatusService bucketStatusService;
 
   @PostMapping("")
   public ResponseEntity<Void> create(@AuthenticationPrincipal AuthMember authMember,
@@ -49,10 +50,9 @@ public class BucketController {
   }
 
   @GetMapping("")
-  public ResponseEntity<Page<BucketResponse>> findAll(
+  public ResponseEntity<Page<BucketResponse>> find(
       @AuthenticationPrincipal AuthMember authMember,
       @ParameterObject SearchBucketRequest request) {
-    System.out.println("authMember = " + authMember);
     Page<BucketData> buckets = bucketQueryService.findBy(request);
     return ResponseEntity.ok(buckets.map(BucketResponse::new));
   }
@@ -71,18 +71,20 @@ public class BucketController {
     return ResponseEntity.noContent().build();
   }
 
-  @PatchMapping("/{bucketId}/finish")
-  public ResponseEntity<Void> bucketFinish(@AuthenticationPrincipal AuthMember authMember,
-      @PathVariable(name = "bucketId") Long bucketId) {
-    finishBucketService.finishBucket(authMember.getMemberId(), bucketId);
+  @PatchMapping("/{bucketId}/status")
+  public ResponseEntity<Void> changeBucketStatus(@AuthenticationPrincipal AuthMember authMember,
+      @PathVariable(name = "bucketId") Long bucketId,
+      @Valid @RequestBody FinishBucketRequest request) {
+    bucketStatusService.changeBucketStatus(authMember.getMemberId(), bucketId, request);
     return ResponseEntity.noContent().build();
   }
 
-  @PatchMapping("/{bucketId}/{bucketTodoId}/finish")
-  public ResponseEntity<Void> bucketTodoFinish(@AuthenticationPrincipal AuthMember authMember,
+  @PatchMapping("/{bucketId}/{bucketTodoId}/status")
+  public ResponseEntity<Void> changeBucketTodoStatus(@AuthenticationPrincipal AuthMember authMember,
       @PathVariable(name = "bucketId") Long bucketId,
-      @PathVariable(name = "bucketTodoId") Long bucketTodoId) {
-    finishBucketService.finishBucketTodo(authMember.getMemberId(), bucketId, bucketTodoId);
+      @PathVariable(name = "bucketTodoId") Long bucketTodoId,
+      @Valid @RequestBody FinishBucketRequest request) {
+    bucketStatusService.changeBucketTodoStatus(authMember.getMemberId(), bucketId, bucketTodoId, request);
     return ResponseEntity.noContent().build();
   }
 
