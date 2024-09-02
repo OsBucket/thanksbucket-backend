@@ -50,3 +50,5 @@ src/main/resources/*.properties
 /src/main/resources-env/preview/*.yaml
 
 /src/test/resources/*.yaml
+
+/src/main/generated/
