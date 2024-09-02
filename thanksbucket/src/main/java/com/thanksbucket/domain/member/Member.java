@@ -1,7 +1,7 @@
 package com.thanksbucket.domain.member;
 
+import com.thanksbucket.base.domain.BaseTimeEntity;
 import com.thanksbucket.domain.bucket.Bucket;
-import com.thanksbucket.domain.common.BaseTimeEntity;
 import com.thanksbucket.domain.occupation.Occupation;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

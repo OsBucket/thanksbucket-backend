@@ -1,6 +1,6 @@
 package com.thanksbucket.domain.occupation;
 
-import com.thanksbucket.domain.common.BaseTimeEntity;
+import com.thanksbucket.base.domain.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,11 +16,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "occupations")
 public class Occupation extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", unique = true, nullable = false)
+  private Long id;
+
+  @Column(unique = true, nullable = false)
+  private String name;
 }

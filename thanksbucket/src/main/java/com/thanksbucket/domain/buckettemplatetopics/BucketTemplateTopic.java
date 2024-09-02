@@ -1,7 +1,7 @@
 package com.thanksbucket.domain.buckettemplatetopics;
 
+import com.thanksbucket.base.domain.BaseTimeEntity;
 import com.thanksbucket.domain.buckettemplate.BucketTemplate;
-import com.thanksbucket.domain.common.BaseTimeEntity;
 import com.thanksbucket.domain.topic.Topic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,16 +21,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "bucket_template_topic")
 public class BucketTemplateTopic extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bucket_template_id", nullable = false)
-    private BucketTemplate bucketTemplate;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", unique = true, nullable = false)
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id", nullable = false)
-    private Topic topic;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "bucket_template_id", nullable = false)
+  private BucketTemplate bucketTemplate;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "topic_id", nullable = false)
+  private Topic topic;
 }

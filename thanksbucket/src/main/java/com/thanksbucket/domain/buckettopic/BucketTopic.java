@@ -1,7 +1,7 @@
 package com.thanksbucket.domain.buckettopic;
 
+import com.thanksbucket.base.domain.BaseTimeEntity;
 import com.thanksbucket.domain.bucket.Bucket;
-import com.thanksbucket.domain.common.BaseTimeEntity;
 import com.thanksbucket.domain.topic.Topic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,25 +21,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "bucket_topics")
 public class BucketTopic extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bucket_id", nullable = false)
-    private Bucket bucket;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", unique = true, nullable = false)
+  private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id", nullable = false)
-    private Topic topic;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "bucket_id", nullable = false)
+  private Bucket bucket;
 
-    public BucketTopic(Bucket bucket, Topic topic) {
-        this.bucket = bucket;
-        this.topic = topic;
-    }
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "topic_id", nullable = false)
+  private Topic topic;
 
-    public static BucketTopic create(Bucket bucket, Topic topic) {
-        return new BucketTopic(bucket, topic);
-    }
+  public BucketTopic(Bucket bucket, Topic topic) {
+    this.bucket = bucket;
+    this.topic = topic;
+  }
+
+  public static BucketTopic create(Bucket bucket, Topic topic) {
+    return new BucketTopic(bucket, topic);
+  }
 }

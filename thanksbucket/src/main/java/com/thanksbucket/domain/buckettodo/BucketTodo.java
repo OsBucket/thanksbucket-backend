@@ -1,7 +1,7 @@
 package com.thanksbucket.domain.buckettodo;
 
+import com.thanksbucket.base.domain.BaseTimeEntity;
 import com.thanksbucket.domain.bucket.Bucket;
-import com.thanksbucket.domain.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,36 +18,37 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BucketTodo extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
 
-    @Column(nullable = false)
-    private String content;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", unique = true, nullable = false)
+  private Long id;
 
-    @Column(nullable = false)
-    private boolean isDone;
+  @Column(nullable = false)
+  private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bucket_id", nullable = false)
-    private Bucket bucket;
+  @Column(nullable = false)
+  private boolean isDone;
 
-    public BucketTodo(String content, boolean isDone, Bucket bucket) {
-        this.content = content;
-        this.isDone = isDone;
-        this.bucket = bucket;
-    }
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "bucket_id", nullable = false)
+  private Bucket bucket;
 
-    public static BucketTodo create(String content, boolean isDone) {
-        return new BucketTodo(content, isDone, null);
-    }
+  public BucketTodo(String content, boolean isDone, Bucket bucket) {
+    this.content = content;
+    this.isDone = isDone;
+    this.bucket = bucket;
+  }
 
-    public void setBucket(Bucket bucket) {
-        this.bucket = bucket;
-    }
+  public static BucketTodo create(String content, boolean isDone) {
+    return new BucketTodo(content, isDone, null);
+  }
 
-    public void done() {
-        this.isDone = true;
-    }
+  public void setBucket(Bucket bucket) {
+    this.bucket = bucket;
+  }
+
+  public void done() {
+    this.isDone = true;
+  }
 }

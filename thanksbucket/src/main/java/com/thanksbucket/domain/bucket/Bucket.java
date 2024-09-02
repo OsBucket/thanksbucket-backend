@@ -1,8 +1,8 @@
 package com.thanksbucket.domain.bucket;
 
+import com.thanksbucket.base.domain.BaseTimeEntity;
 import com.thanksbucket.domain.buckettodo.BucketTodo;
 import com.thanksbucket.domain.buckettopic.BucketTopic;
-import com.thanksbucket.domain.common.BaseTimeEntity;
 import com.thanksbucket.domain.member.Member;
 import com.thanksbucket.domain.topic.Topic;
 import jakarta.persistence.CascadeType;
@@ -16,95 +16,96 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "buckets")
 public class Bucket extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
 
-    @Column
-    private String title;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", unique = true, nullable = false)
+  private Long id;
 
-    @Column
-    private LocalDate goalDate;
+  @Column
+  private String title;
 
-    @Column(nullable = false)
-    private boolean isDone;
+  @Column
+  private LocalDate goalDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+  @Column(nullable = false)
+  private boolean isDone;
 
-    @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BucketTopic> bucketTopics = new ArrayList<>();
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "member_id")
+  private Member member;
 
-    @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BucketTodo> bucketTodos = new ArrayList<>();
+  @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<BucketTopic> bucketTopics = new ArrayList<>();
+
+  @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<BucketTodo> bucketTodos = new ArrayList<>();
 
 
-    public Bucket(String title, LocalDate goalDate, boolean isDone, Member member) {
-        this.title = title;
-        this.goalDate = goalDate;
-        this.isDone = isDone;
-        this.member = member;
+  public Bucket(String title, LocalDate goalDate, boolean isDone, Member member) {
+    this.title = title;
+    this.goalDate = goalDate;
+    this.isDone = isDone;
+    this.member = member;
+  }
+
+  public static Bucket create(String title, LocalDate goalDate, Member member) {
+    Bucket bucket = new Bucket(title, goalDate, false, member);
+    return bucket;
+  }
+
+  public void addTopics(List<Topic> topics) {
+    this.bucketTopics.addAll(
+        topics.stream().map(topic -> BucketTopic.create(this, topic)).toList());
+  }
+
+  public void addTodos(List<BucketTodo> todos) {
+    todos.forEach(todo -> todo.setBucket(this));
+    this.bucketTodos.addAll(todos);
+  }
+
+  public void validateOwner(Member member) {
+    if (!this.member.equals(member)) {
+      throw new IllegalArgumentException("해당 버킷에 대한 권한이 없습니다.");
     }
+  }
 
-    public static Bucket create(String title, LocalDate goalDate, Member member) {
-        Bucket bucket = new Bucket(title, goalDate, false, member);
-        return bucket;
-    }
+  public void update(Member member, String title, LocalDate goalDate) {
+    this.validateOwner(member);
+    this.bucketTopics.clear();
+    this.bucketTodos.clear();
+    this.title = title;
+    this.goalDate = goalDate;
+  }
 
-    public void addTopics(List<Topic> topics) {
-        this.bucketTopics.addAll(topics.stream().map(topic -> BucketTopic.create(this, topic)).toList());
-    }
+  public void updateTopics(List<Topic> topics) {
+    this.bucketTopics.clear();
+    this.addTopics(topics);
+  }
 
-    public void addTodos(List<BucketTodo> todos) {
-        todos.forEach(todo -> todo.setBucket(this));
-        this.bucketTodos.addAll(todos);
-    }
+  public void updateTodos(List<BucketTodo> bucketTodos) {
+    this.bucketTodos.clear();
+    this.addTodos(bucketTodos);
+  }
 
-    public void validateOwner(Member member) {
-        if (!this.member.equals(member)) {
-            throw new IllegalArgumentException("해당 버킷에 대한 권한이 없습니다.");
-        }
+  public void updateIsDone(boolean isDone) {
+    if (!isDone) {
+      this.isDone = false;
+      return;
     }
-
-    public void update(Member member, String title, LocalDate goalDate) {
-        this.validateOwner(member);
-        this.bucketTopics.clear();
-        this.bucketTodos.clear();
-        this.title = title;
-        this.goalDate = goalDate;
-    }
-
-    public void updateTopics(List<Topic> topics) {
-        this.bucketTopics.clear();
-        this.addTopics(topics);
-    }
-
-    public void updateTodos(List<BucketTodo> bucketTodos) {
-        this.bucketTodos.clear();
-        this.addTodos(bucketTodos);
-    }
-
-    public void updateIsDone(boolean isDone) {
-        if (!isDone) {
-            this.isDone = false;
-            return;
-        }
-        bucketTodos.forEach(BucketTodo::done);
-        this.isDone = true;
-    }
+    bucketTodos.forEach(BucketTodo::done);
+    this.isDone = true;
+  }
 }
