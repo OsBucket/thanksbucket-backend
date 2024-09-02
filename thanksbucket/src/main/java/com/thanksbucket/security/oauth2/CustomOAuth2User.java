@@ -1,7 +1,7 @@
 package com.thanksbucket.security.oauth2;
 
-import com.thanksbucket.core.member.query.domain.Member;
-import com.thanksbucket.core.member.query.domain.SocialType;
+import com.thanksbucket.core.member.domain.Member;
+import com.thanksbucket.core.member.domain.SocialType;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

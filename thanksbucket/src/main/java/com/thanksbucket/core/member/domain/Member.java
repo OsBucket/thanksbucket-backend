@@ -1,4 +1,4 @@
-package com.thanksbucket.core.member.query.domain;
+package com.thanksbucket.core.member.domain;
 
 import com.thanksbucket.base.domain.AggregateRoot;
 import com.thanksbucket.core.occupation.domain.Occupation;
@@ -33,7 +33,7 @@ public class Member extends AggregateRoot<Member, Long> {
   @Column(nullable = false)
   private String email;
 
-  @Column(unique = true, nullable = false)
+  @Column(unique = true)
   private String nickname;
 
   @Column

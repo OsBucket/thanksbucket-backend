@@ -1,8 +1,8 @@
 package com.thanksbucket.security.oauth2.service;
 
 import com.thanksbucket.application.AuthService;
-import com.thanksbucket.core.member.query.domain.Member;
-import com.thanksbucket.core.member.query.domain.SocialType;
+import com.thanksbucket.core.member.domain.Member;
+import com.thanksbucket.core.member.domain.SocialType;
 import com.thanksbucket.security.oauth2.CustomOAuth2User;
 import com.thanksbucket.security.oauth2.userinfo.OAuth2UserInfo;
 import com.thanksbucket.security.oauth2.userinfo.OAuth2UserInfoFactory;
@@ -52,6 +52,4 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     // DefaultOAuth2User를 구현한 CustomOAuth2User 객체를 생성해서 반환
     return CustomOAuth2User.ofMember(member, attributes, userNameAttributeName);
   }
-
-
 }

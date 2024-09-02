@@ -1,4 +1,4 @@
-package com.thanksbucket.core.member.query.domain;
+package com.thanksbucket.core.member.domain;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

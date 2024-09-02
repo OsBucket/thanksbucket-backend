@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.thanksbucket.common.ui.dto.SuccessResponse;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
-import com.thanksbucket.security.dto.JWTResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,17 +20,9 @@ public class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHan
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   private final JWTUtils jwtUtils;
-  private AuthenticationSuccessHandler addSuccessHandler;
 
   public JWTAuthenticationSuccessHandler(JWTUtils jwtUtils) {
     this.jwtUtils = jwtUtils;
-  }
-
-  //TODO Session 하위호환성
-  public JWTAuthenticationSuccessHandler(JWTUtils jwtUtils,
-      AuthenticationSuccessHandler addSuccessHandler) {
-    this.jwtUtils = jwtUtils;
-    this.addSuccessHandler = addSuccessHandler;
   }
 
   @Override
@@ -42,9 +33,6 @@ public class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHan
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
     String jwtToken = jwtUtils.generateToken(authMember);
-
-    //TODO Session 하위호환성
-    addSuccessHandler.onAuthenticationSuccess(request, response, authentication);
 
     //TODO 리프레시 토큰추가
     JWTResponse body = new JWTResponse(authMember.getEmail(), jwtToken, jwtToken);

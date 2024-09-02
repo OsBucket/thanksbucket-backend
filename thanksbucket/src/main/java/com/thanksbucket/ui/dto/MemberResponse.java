@@ -1,6 +1,6 @@
 package com.thanksbucket.ui.dto;
 
-import com.thanksbucket.core.member.query.domain.Member;
+import com.thanksbucket.core.member.domain.Member;
 import lombok.Getter;
 
 @Getter

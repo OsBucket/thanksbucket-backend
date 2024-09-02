@@ -1,7 +1,8 @@
-package com.thanksbucket.security.authentication.userdetails;
+package com.thanksbucket.security.usernamepassword;
 
-import com.thanksbucket.core.member.query.domain.Member;
-import com.thanksbucket.core.member.query.domain.MemberRepository;
+import com.thanksbucket.core.member.domain.Member;
+import com.thanksbucket.core.member.domain.MemberRepository;
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

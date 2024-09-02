@@ -1,7 +1,7 @@
 package com.thanksbucket.core.member.ui;
 
 import com.thanksbucket.application.AuthService;
-import com.thanksbucket.core.member.query.domain.Member;
+import com.thanksbucket.core.member.domain.Member;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import com.thanksbucket.security.authentication.www.jwt.JWTUtils;
 import com.thanksbucket.ui.dto.ProfileResponse;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @Tag(name = "auth", description = "인증")
 @Slf4j
 public class AuthController {

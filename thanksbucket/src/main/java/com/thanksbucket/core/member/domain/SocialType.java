@@ -1,4 +1,4 @@
-package com.thanksbucket.core.member.query.domain;
+package com.thanksbucket.core.member.domain;
 
 public enum SocialType {
   KAKAO, GOOGLE, NAVER;

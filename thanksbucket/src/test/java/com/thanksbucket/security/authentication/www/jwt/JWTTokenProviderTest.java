@@ -1,10 +1,10 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
-import static com.thanksbucket.core.member.query.domain.MemberRole.ROLE_USER;
+import static com.thanksbucket.core.member.domain.MemberRole.ROLE_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.thanksbucket.core.member.query.domain.Member;
-import com.thanksbucket.core.member.query.domain.MemberRepository;
+import com.thanksbucket.core.member.domain.Member;
+import com.thanksbucket.core.member.domain.MemberRepository;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

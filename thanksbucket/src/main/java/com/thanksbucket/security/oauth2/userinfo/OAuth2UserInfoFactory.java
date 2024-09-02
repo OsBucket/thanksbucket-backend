@@ -1,6 +1,6 @@
 package com.thanksbucket.security.oauth2.userinfo;
 
-import com.thanksbucket.core.member.query.domain.SocialType;
+import com.thanksbucket.core.member.domain.SocialType;
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

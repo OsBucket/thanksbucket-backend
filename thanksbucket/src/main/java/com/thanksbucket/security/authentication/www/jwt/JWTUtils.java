@@ -1,7 +1,7 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
-import com.thanksbucket.core.member.query.domain.Member;
-import com.thanksbucket.core.member.query.domain.MemberRole;
+import com.thanksbucket.core.member.domain.Member;
+import com.thanksbucket.core.member.domain.MemberRole;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
 import com.thanksbucket.security.oauth2.CustomOAuth2User;
 import io.jsonwebtoken.Claims;

@@ -1,7 +1,7 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
 
-import static com.thanksbucket.core.member.query.domain.MemberRole.ROLE_USER;
+import static com.thanksbucket.core.member.domain.MemberRole.ROLE_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;

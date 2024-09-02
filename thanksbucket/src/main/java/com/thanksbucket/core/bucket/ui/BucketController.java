@@ -47,7 +47,9 @@ public class BucketController {
 
   @GetMapping("")
   public ResponseEntity<Page<BucketResponse>> findAll(
+      @AuthenticationPrincipal AuthMember authMember,
       @ParameterObject SearchBucketRequest request) {
+    System.out.println("authMember = " + authMember);
     Page<BucketData> buckets = bucketService.findBy(request);
     return ResponseEntity.ok(buckets.map(BucketResponse::new));
   }

@@ -3,7 +3,7 @@ package com.thanksbucket.core.bucket.command.application;
 import com.thanksbucket.application.MemberService;
 import com.thanksbucket.core.bucket.query.BucketData;
 import com.thanksbucket.core.bucket.query.BucketQueryRepository;
-import com.thanksbucket.core.member.query.domain.Member;
+import com.thanksbucket.core.member.domain.Member;
 import com.thanksbucket.core.topic.domain.TopicRepository;
 import com.thanksbucket.ui.dto.PatchBucketRequest;
 import com.thanksbucket.ui.dto.SearchBucketRequest;

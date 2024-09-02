@@ -1,6 +1,6 @@
 package com.thanksbucket.security.authentication.userdetails;
 
-import com.thanksbucket.core.member.query.domain.Member;
+import com.thanksbucket.core.member.domain.Member;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,7 +20,7 @@ public class AuthMember extends User {
 
   public static AuthMember fromMember(Member member) {
     return new AuthMember(member.getId(), member.getEmail(), member.getNickname(),
-        member.getPassword(), List.of(member.getMemberRole()));
+        null, List.of(member.getMemberRole()));
   }
 
   public static AuthMember fromToken(Long memberId, String email, String nickname, String token,
