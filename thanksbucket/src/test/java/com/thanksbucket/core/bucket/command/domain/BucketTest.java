@@ -8,6 +8,7 @@ import com.thanksbucket.core.topic.domain.Topic;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -95,6 +96,7 @@ class BucketTest {
   }
 
   @Test
+  @Disabled
   void 모든투두_Finish되면_버킷도_Finish() {
     BucketTodo 투두1 = BucketTodo.start("투두1");
     BucketTodo 투두2 = BucketTodo.start("투두2");

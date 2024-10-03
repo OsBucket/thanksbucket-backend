@@ -25,7 +25,7 @@ public class UpdateBucketRequest {
 
   public List<BucketTodo> toBucketTodos() {
     return bucketTodos.stream()
-        .map(todo -> BucketTodo.create(todo.getContent(), todo.getProcessStatus()))
+        .map(todo -> BucketTodo.create(todo.getContent(), todo.getTodoStatus()))
         .toList();
   }
 
@@ -35,6 +35,6 @@ public class UpdateBucketRequest {
     @NotBlank
     private String content;
     @NotNull
-    private ProcessStatus processStatus;
+    private ProcessStatus todoStatus;
   }
 }

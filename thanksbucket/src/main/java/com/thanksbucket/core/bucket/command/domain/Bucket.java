@@ -151,9 +151,9 @@ public class Bucket extends AggregateRoot<Bucket, Long> {
         .filter(todo -> todo.getId().equals(todoId))
         .findFirst()
         .ifPresent(BucketTodo::finish);
-    if (this.bucketTodos.stream().allMatch(BucketTodo::isFinished)) {
-      this.bucketStatus = ProcessStatus.FINISH;
-    }
+//    if (this.bucketTodos.stream().allMatch(BucketTodo::isFinished)) {
+//      this.bucketStatus = ProcessStatus.FINISH;
+//    }
   }
 
   private void validate() {

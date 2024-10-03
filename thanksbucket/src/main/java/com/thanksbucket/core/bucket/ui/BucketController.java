@@ -8,9 +8,8 @@ import com.thanksbucket.core.bucket.command.application.dto.FinishBucketRequest;
 import com.thanksbucket.core.bucket.command.application.dto.StartBucketRequest;
 import com.thanksbucket.core.bucket.command.application.dto.UpdateBucketRequest;
 import com.thanksbucket.core.bucket.query.application.BucketQueryService;
-import com.thanksbucket.core.bucket.query.domain.BucketData;
+import com.thanksbucket.core.bucket.query.application.dto.BucketDetail;
 import com.thanksbucket.security.authentication.userdetails.AuthMember;
-import com.thanksbucket.ui.dto.BucketResponse;
 import com.thanksbucket.ui.dto.SearchBucketRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -50,17 +49,16 @@ public class BucketController {
   }
 
   @GetMapping("")
-  public ResponseEntity<Page<BucketResponse>> find(
-      @AuthenticationPrincipal AuthMember authMember,
+  public ResponseEntity<Page<BucketDetail>> find(
       @ParameterObject SearchBucketRequest request) {
-    Page<BucketData> buckets = bucketQueryService.findBy(request);
-    return ResponseEntity.ok(buckets.map(BucketResponse::new));
+    Page<BucketDetail> buckets = bucketQueryService.findBy(request);
+    return ResponseEntity.ok(buckets);
   }
 
   @GetMapping("/{bucketId}")
-  public ResponseEntity<BucketResponse> findById(@PathVariable(name = "bucketId") Long bucketId) {
-    BucketData bucket = bucketQueryService.findById(bucketId);
-    return ResponseEntity.ok(new BucketResponse(bucket));
+  public ResponseEntity<BucketDetail> findById(@PathVariable(name = "bucketId") Long bucketId) {
+    BucketDetail bucket = bucketQueryService.findById(bucketId);
+    return ResponseEntity.ok(bucket);
   }
 
   @PutMapping("/{bucketId}")
@@ -79,12 +77,13 @@ public class BucketController {
     return ResponseEntity.noContent().build();
   }
 
-  @PatchMapping("/{bucketId}/{bucketTodoId}/status")
+  @PatchMapping("/{bucketId}/bucketTodos/{bucketTodoId}/status")
   public ResponseEntity<Void> changeBucketTodoStatus(@AuthenticationPrincipal AuthMember authMember,
       @PathVariable(name = "bucketId") Long bucketId,
       @PathVariable(name = "bucketTodoId") Long bucketTodoId,
       @Valid @RequestBody FinishBucketRequest request) {
-    bucketStatusService.changeBucketTodoStatus(authMember.getMemberId(), bucketId, bucketTodoId, request);
+    bucketStatusService.changeBucketTodoStatus(authMember.getMemberId(), bucketId, bucketTodoId,
+        request);
     return ResponseEntity.noContent().build();
   }
 

@@ -4,13 +4,13 @@ import com.thanksbucket.core.member.domain.Member;
 import lombok.Getter;
 
 @Getter
-public class MemberResponse {
+public class MemberDetail {
 
   private final Long id;
   private final String nickname;
   private final String imageUrl;
 
-  public MemberResponse(Member member) {
+  public MemberDetail(Member member) {
     this.id = member.getId();
     this.nickname = member.getNickname();
     this.imageUrl = member.getImageUrl();
