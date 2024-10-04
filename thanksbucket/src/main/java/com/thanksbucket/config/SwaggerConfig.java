@@ -30,14 +30,12 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
 @Configuration
-@EnableWebMvc
 @Slf4j
 public class SwaggerConfig {
     @Value("${swagger.api.title}")
@@ -63,7 +61,6 @@ public class SwaggerConfig {
                 .type(SecurityScheme.Type.HTTP)
                 .bearerFormat("JWT")
                 .scheme("bearer");
-
 
 
         return new OpenAPI()

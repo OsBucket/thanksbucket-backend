@@ -10,8 +10,8 @@ class SlackServiceTest {
     @Autowired
     SlackService slackService;
 
-    @Test
-    void sendSignupMessage() {
-//        slackService.sendSignupMessage("이루다");
-    }
+//    @Test
+//    void sendSignupMessage() {
+////        slackService.sendSignupMessage("이루다");
+//    }
 }

@@ -1,30 +1,42 @@
 package com.thanksbucket.security.authentication.userdetails;
 
-import com.thanksbucket.domain.member.Member;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-
+import com.thanksbucket.core.member.domain.Member;
 import java.util.Collection;
 import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 public class AuthMember extends User {
-    public static final String DEFAULT_ROLE = "ROLE_USER";
 
-    public static AuthMember fromMember(Member member) {
-        List<GrantedAuthority> defaultAuthorities = generateDefaultAuthorities();
-        return new AuthMember(member.getMemberId(), member.getPassword(), defaultAuthorities);
-    }
+  private final String email;
+  private final String nickname;
 
-    public AuthMember(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
-    }
+  private AuthMember(Long memberId, String email, String nickname, String password,
+      Collection<? extends GrantedAuthority> authorities) {
+    super(String.valueOf(memberId), password, authorities);
+    this.email = email;
+    this.nickname = nickname;
+  }
 
-    public AuthMember(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-    }
+  public static AuthMember fromMember(Member member) {
+    return new AuthMember(member.getId(), member.getEmail(), member.getNickname(),
+        null, List.of(member.getMemberRole()));
+  }
 
-    private static List<GrantedAuthority> generateDefaultAuthorities() {
-        return List.of(new SimpleGrantedAuthority(DEFAULT_ROLE));
-    }
+  public static AuthMember fromToken(Long memberId, String email, String nickname, String token,
+      Collection<? extends GrantedAuthority> authorities) {
+    return new AuthMember(memberId, email, nickname, token, authorities);
+  }
+
+  public Long getMemberId() {
+    return Long.parseLong(getUsername());
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public String getNickname() {
+    return nickname;
+  }
 }

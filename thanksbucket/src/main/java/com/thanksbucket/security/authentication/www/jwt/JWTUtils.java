@@ -1,5 +1,9 @@
 package com.thanksbucket.security.authentication.www.jwt;
 
+import com.thanksbucket.core.member.domain.Member;
+import com.thanksbucket.core.member.domain.MemberRole;
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
+import com.thanksbucket.security.oauth2.CustomOAuth2User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -7,84 +11,111 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
-import java.security.Key;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static com.thanksbucket.security.authentication.userdetails.AuthMember.DEFAULT_ROLE;
 
 @Component
 @Slf4j
 public class JWTUtils {
-    private static final String CLAIM_AUTHORITIES_KEY = "AUTH";
-    private final String SECRET_KEY;
-    private final long EXPIRE_MINUTES;
 
-    private final Key key;
+  private static final String CLAIM_AUTHORITIES_KEY = "AUTHORITIES";
+  private static final String CLAIM_EMAIL_KEY = "EMAIL";
+  private static final String CLAIM_NICKNAME_KEY = "NICKNAME";
+  private final String SECRET_KEY;
+  private final long ACCESS_EXPIRE_MINUTE;
+  private final long REFRESH_EXPIRE_MINUTE;
 
-    public JWTUtils(@Value("${jwt.token.secret-key}") String secretKey, @Value("${jwt.token.access-token-expire-minutes}") long expireMinutes) {
-        this.SECRET_KEY = secretKey;
-        this.EXPIRE_MINUTES = expireMinutes;
-        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+  private final SecretKey key;
+
+  public JWTUtils(@Value("${jwt.secret-key}") String secretKey,
+      @Value("${jwt.access-token.expire-minutes}") long accessExpireMinutes,
+      @Value("${jwt.refresh-token.expire-minutes}") long refreshExpireMinutes
+  ) {
+    this.SECRET_KEY = secretKey;
+    this.ACCESS_EXPIRE_MINUTE = accessExpireMinutes;
+    this.REFRESH_EXPIRE_MINUTE = refreshExpireMinutes;
+    this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+  }
+
+  public String generateToken(CustomOAuth2User customOAuth2User) {
+    return generateToken(customOAuth2User.getMemberId(), customOAuth2User.getEmail(),
+        customOAuth2User.getNickname(), customOAuth2User.getAuthorities());
+  }
+
+  public String generateToken(Member member) {
+    return generateToken(member.getId(), member.getEmail(), member.getNickname(),
+        List.of(member.getMemberRole()));
+  }
+
+  public String generateToken(AuthMember authMember) {
+    return generateToken(authMember.getMemberId(), authMember.getEmail(), authMember.getNickname(),
+        authMember.getAuthorities());
+  }
+
+  public String generateToken(Long memberId, String email, String nickname,
+      Collection<? extends GrantedAuthority> memberRoles) {
+    return Jwts.builder()
+        .issuer("ThanksBucket")
+        .subject(String.valueOf(memberId))
+        .expiration(java.sql.Timestamp.valueOf(getExpireDate()))
+        .issuedAt(new Date())
+        .claims()
+        .add(CLAIM_EMAIL_KEY, email)
+        .add(CLAIM_NICKNAME_KEY, nickname)
+        .add(CLAIM_AUTHORITIES_KEY,
+            memberRoles.stream().map(GrantedAuthority::getAuthority).toList())
+        .and()
+        .signWith(key)
+        .compact();
+  }
+
+  public Claims decodeToken(String token) {
+    try {
+      return Jwts.parser()
+          .verifyWith(key)
+          .build()
+          .parseSignedClaims(token)
+          .getPayload();
+    } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+      throw new AuthenticationServiceException("잘못된 JWT 서명입니다.");
+    } catch (ExpiredJwtException e) {
+      throw new AuthenticationServiceException("만료된 JWT 토큰입니다.");
+    } catch (UnsupportedJwtException e) {
+      throw new AuthenticationServiceException("지원되지 않는 JWT 토큰입니다.");
     }
+  }
 
-    public String generateToken(String username, Collection<GrantedAuthority> authorities) {
-        return Jwts.builder()
-                .issuer("ThanksBucket")
-                .subject("Authorization")
-                .audience().add(username).and()
-                .expiration(java.sql.Timestamp.valueOf(getExpireDate()))
-                .notBefore(new Date())
-                .issuedAt(new Date())
-                .id(username)
-                .claims().add(CLAIM_AUTHORITIES_KEY, authorities).and()
-                .signWith(key)
-                .compact();
-    }
+  public Long getMemberId(String token) {
+    Claims claims = decodeToken(token);
+    return Long.parseLong(claims.getSubject());
+  }
 
-    public Claims decodeToken(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith((SecretKey) key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            throw new AuthenticationServiceException("잘못된 JWT 서명입니다.");
-        } catch (ExpiredJwtException e) {
-            throw new AuthenticationServiceException("만료된 JWT 토큰입니다.");
-        } catch (UnsupportedJwtException e) {
-            throw new AuthenticationServiceException("지원되지 않는 JWT 토큰입니다.");
-        }
-    }
+  public String getEmail(String token) {
+    Claims claims = decodeToken(token);
+    return claims.get(CLAIM_EMAIL_KEY, String.class);
+  }
 
-    public Collection<GrantedAuthority> getAuthorities(String token) {
-        Claims claims = decodeToken(token);
-        List<Map<String, GrantedAuthority>> roles = claims.get(CLAIM_AUTHORITIES_KEY, List.class);
-        // TODO Authorities 반환값이 이상함 확인 필요
-        // TODO 임시 하드 코딩
-        return List.of(new SimpleGrantedAuthority(DEFAULT_ROLE));
-//        return roles.stream().map(authorities -> authorities.get("authority")).collect(Collectors.toList());
-    }
+  public String getNickname(String token) {
+    Claims claims = decodeToken(token);
+    return claims.get(CLAIM_NICKNAME_KEY, String.class);
+  }
 
-    public String getUsername(String token) {
-        Claims claims = decodeToken(token);
-        String id = claims.getId();
-        return id;
-    }
+  public List<MemberRole> getAuthorities(String token) {
+    Claims claims = decodeToken(token);
+    ArrayList<String> roles = claims.get(CLAIM_AUTHORITIES_KEY, ArrayList.class);
+    return roles.stream().map(MemberRole::of).toList();
+  }
 
-    public LocalDateTime getExpireDate() {
-        return LocalDateTime.now().plusMinutes(EXPIRE_MINUTES);
-    }
+  public LocalDateTime getExpireDate() {
+    return LocalDateTime.now().plusMinutes(ACCESS_EXPIRE_MINUTE);
+  }
 }

@@ -1,0 +1,48 @@
+package com.thanksbucket.security.authentication.www.jwt;
+
+import static com.thanksbucket.core.member.domain.MemberRole.ROLE_USER;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.thanksbucket.core.member.domain.Member;
+import com.thanksbucket.core.member.domain.MemberRepository;
+import com.thanksbucket.security.authentication.userdetails.AuthMember;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class JWTTokenProviderTest {
+
+  private JWTTokenProvider jwtTokenProvider;
+  @Autowired
+  private MemberRepository memberRepository;
+  @Autowired
+  private JWTUtils jwtUtils;
+
+  @BeforeEach
+  void setUp() {
+    jwtTokenProvider = new JWTTokenProvider(jwtUtils);
+    memberRepository.save(new Member("testemail@naver.com", "testnickname", ROLE_USER));
+  }
+
+  @Test
+  void authenticate() {
+    //given jwt 토큰 생성
+    String token = jwtUtils.generateToken(1L, "testemail@naver.com", "testnickname",
+        List.of(ROLE_USER));
+
+    //when jwt 토큰 인증
+    JWTAuthenticationToken jwtAuthenticationToken = (JWTAuthenticationToken) jwtTokenProvider.authenticate(
+        JWTAuthenticationToken.unauthenticated("Bearer " + token)
+    );
+
+    //then jwt 토큰 인증 결과 확인
+    assertThat(jwtAuthenticationToken.getPrincipal()).isInstanceOf(AuthMember.class);
+    AuthMember authMember = (AuthMember) jwtAuthenticationToken.getPrincipal();
+    assertThat(authMember.getEmail()).isEqualTo("testemail@naver.com");
+    assertThat(authMember.getNickname()).isEqualTo("testnickname");
+    assertThat(authMember.getAuthorities()).containsExactly(ROLE_USER);
+  }
+}

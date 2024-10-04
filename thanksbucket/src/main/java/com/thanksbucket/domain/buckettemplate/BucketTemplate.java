@@ -1,7 +1,7 @@
 package com.thanksbucket.domain.buckettemplate;
 
+import com.thanksbucket.base.domain.BaseTimeEntity;
 import com.thanksbucket.domain.buckettemplatetopics.BucketTemplateTopic;
-import com.thanksbucket.domain.common.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,35 +10,36 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "bucket_template")
 public class BucketTemplate extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
 
-    @Column(nullable = false)
-    private String bucketName;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", unique = true, nullable = false)
+  private Long id;
 
-    @OneToMany(mappedBy = "bucketTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BucketTemplateTopic> bucketTemplateTopics = new ArrayList<>();
+  @Column(nullable = false)
+  private String bucketName;
 
-    @Column
-    private String bucketTodoNames;
+  @OneToMany(mappedBy = "bucketTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<BucketTemplateTopic> bucketTemplateTopics = new ArrayList<>();
 
-    public BucketTemplate(String bucketName, List<BucketTemplateTopic> bucketTemplateTopics, String bucketTodoNames) {
-        this.bucketName = bucketName;
-        this.bucketTemplateTopics = bucketTemplateTopics;
-        this.bucketTodoNames = bucketTodoNames;
-    }
+  @Column
+  private String bucketTodoNames;
+
+  public BucketTemplate(String bucketName, List<BucketTemplateTopic> bucketTemplateTopics,
+      String bucketTodoNames) {
+    this.bucketName = bucketName;
+    this.bucketTemplateTopics = bucketTemplateTopics;
+    this.bucketTodoNames = bucketTodoNames;
+  }
 }

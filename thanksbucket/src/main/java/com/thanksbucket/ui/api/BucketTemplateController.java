@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bucket-templates")
+@RequestMapping("/bucket-templates")
 @Tag(name = "bucket-templates", description = "버킷 템플릿")
 @RequiredArgsConstructor
 public class BucketTemplateController {
